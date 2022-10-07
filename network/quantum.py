@@ -12,7 +12,7 @@ from qiskit.quantum_info.operators.predicates import (is_hermitian_matrix,
                                                       is_unitary_matrix)
 
 
-tf.config.set_visible_devices([], 'GPU')
+# tf.config.set_visible_devices([], 'GPU')
 
 class QuantumOperator():
   def __init__(self, 

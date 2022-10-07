@@ -2,6 +2,7 @@ tensorflow-gpu
 tensorflow-probability
 numpy
 matplotlib
+scipy
 qiskit
 qiskit-aer-gpu
 pylatexenc

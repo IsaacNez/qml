@@ -1,4 +1,5 @@
-import numpy as np
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 import sys
 import tensorflow as tf
 import tensorflow_probability as tfp
@@ -7,7 +8,7 @@ from network.quantum import QuantumOperator
 import utils.utils as tl
 from joblib import Parallel, delayed
 
-tf.config.set_visible_devices([], 'GPU')
+# tf.config.set_visible_devices([], 'GPU')
 
 class Network():
   def __init__(self,  image_size: int = 4,
@@ -72,7 +73,7 @@ class Network():
     idx_data, idx_label = batch
     total_loss, total_correct, iteration = 0.0, 0, 0
 
-    results = Parallel(n_jobs=12)(delayed(self.execute)(image, label, weights, self.efficient, classes) for image, label in zip(idx_data, idx_label))
+    results = Parallel(n_jobs=os.cpu_count())(delayed(self.execute)(image, label, weights, self.efficient, classes) for image, label in zip(idx_data, idx_label))
 
     for values in results:
       total_loss += values[0]
@@ -146,7 +147,7 @@ class Network():
 if __name__ == '__main__':
   image_size = 8
   classes = {0: "0", 1: "1"}
-  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=5, efficient=True, batch=24)
+  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=5, efficient=True, batch=222)
   model.train(output_results=True)
 
 
