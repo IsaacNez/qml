@@ -8,7 +8,7 @@ from network.quantum import QuantumOperator
 import utils.utils as tl
 from joblib import Parallel, delayed
 
-# tf.config.set_visible_devices([], 'GPU')
+tf.config.set_visible_devices([], 'GPU')
 
 class Network():
   def __init__(self,  image_size: int = 4,

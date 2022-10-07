@@ -6,7 +6,7 @@ import tensorflow as tf
 
 from utils.utils import *
 
-# tf.config.set_visible_devices([], 'GPU')
+tf.config.set_visible_devices([], 'GPU')
 
 class Dataset():
   """MNIST Dataset Class"""
