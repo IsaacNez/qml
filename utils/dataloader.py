@@ -137,7 +137,7 @@ class Dataset():
     for idx in range(0, self.image_train.shape[0], batch):
       lim = min(idx + batch, self.image_train.shape[0])
       idxs = indeces[idx:lim] if shuffle else slice(idx, lim)
-      yield self.image_train[idxs], self.label_train[idxs]
+      yield tf.gather(self.image_train, indices=idxs), tf.gather(self.label_train, indices=idxs)
       
   def get_image(self):
     return self.image_train[0]

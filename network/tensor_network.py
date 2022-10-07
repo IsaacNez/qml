@@ -29,7 +29,8 @@ class Network():
                       epochs: int = 10,
                       batch: int = 222,
                       classes: dict = {9: "0", 0: "1"},
-                      efficient: bool = False):
+                      efficient: bool = False,
+                      shuffle: bool = False):
   
     self.image_size         = image_size
     self.circuit_dim        = circuit_dim
@@ -51,6 +52,7 @@ class Network():
     self.weights            = tf.random.normal((self.circuit_dim - 1, self.unitary_dim ** 2)) if not efficient else tf.random.normal((self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2))
     self.classes            = classes
     self.efficient          = efficient
+    self.shuffle            = shuffle
 
     self.dataset = Dataset( image_size=self.image_size,
                             enable_transformations=self.enable_transform,
@@ -117,7 +119,7 @@ class Network():
         print(f"Epoch {epoch}/{self.epochs}")
 
       num_batch = 0
-      for batch in self.dataset.get_batch(batch=self.batch):
+      for batch in self.dataset.get_batch(batch=self.batch, shuffle=self.shuffle):
         print(f"Batch: {num_batch}\n")
         delta = tfp.distributions.Bernoulli(probs=0.5, dtype=tf.float32).sample(sample_shape=(self.circuit_dim - 1, self.unitary_dim ** 2) if not self.efficient else (self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2))
         # delta = tf.random.normal((self.circuit_dim - 1, self.unitary_dim ** 2))
@@ -159,7 +161,7 @@ class Network():
 if __name__ == '__main__':
   image_size = 8
   classes = {0: "0", 1: "1"}
-  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=200, efficient=True, batch=222)
+  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=200, efficient=True, batch=222, shuffle=True)
   model.train(output_results=True)
 
 
