@@ -145,9 +145,9 @@ class Network():
 
 
 if __name__ == '__main__':
-  image_size = 8
+  image_size = 4
   classes = {0: "0", 1: "1"}
-  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=5, efficient=True, batch=222)
+  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=10, efficient=False, batch=222)
   model.train(output_results=True)
 
 
