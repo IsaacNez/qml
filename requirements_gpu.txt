@@ -1,0 +1,7 @@
+tensorflow-gpu
+tensorflow-probability
+numpy
+matplotlib
+qiskit
+qiskit-aer-gpu
+pylatexenc

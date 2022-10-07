@@ -1,0 +1,7 @@
+tensorflow
+tensorflow-probability
+numpy
+matplotlib
+qiskit
+qiskit-aer
+pylatexenc
