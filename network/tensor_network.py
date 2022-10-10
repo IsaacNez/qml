@@ -61,6 +61,11 @@ class Network():
     self.efficient          = efficient
     self.shuffle            = shuffle
 
+    print("Welcome to TN on Qiskit!!!")
+    if self.enable_log:
+      print(f"\u2192This code will be run on an image size of {self.image_size}x{self.image_size} on Qiskit with {self.shots} shots")
+      print(f"\u2192We will train for {self.epochs} epochs with a batch size of {self.batch} on", "a shuffled" if self.shuffle else "an unshuffled", "dataset")
+    print("")
     self.dataset = Dataset( image_size=self.image_size,
                             enable_transformations=self.enable_transform,
                             enable_log=self.enable_log, filter=True, filter_by=self.classes, samples=samples, shuffle=self.shuffle)
