@@ -9,7 +9,7 @@ import utils.utils as tl
 from joblib import Parallel, delayed
 from itertools import cycle
 
-tf.config.set_visible_devices([], 'GPU')
+# tf.config.set_visible_devices([], 'GPU')
 
 class Network():
   def __init__(self,  image_size: int = 4,
@@ -67,8 +67,8 @@ class Network():
     p_max_false = max(prediction.values()) / self.shots
     return max(p_max_false - p_label + self.param_lambda, 0) ** self.param_eta, 1 if p_result == p_label else 0
 
-  def execute(self, image, label, weights, efficient, classes):
-    result = self.qcircuit.execute(image, weights=weights, efficient=efficient)
+  def execute(self, image, label, weights, efficient, classes, device):
+    result = self.qcircuit.execute(image, weights=weights, efficient=efficient, device=device)
     loss, correct = self.loss(result, label, classes)
     return loss, correct
 
@@ -77,31 +77,24 @@ class Network():
     total_loss, total_correct, iteration = 0.0, 0, 0
     
     jobs = os.cpu_count()
-    results = Parallel(n_jobs=int(jobs))(delayed(self.execute)(image, label, weights, self.efficient, classes) for image, label in zip(idx_data, idx_label))
+    devices = tf.config.list_physical_devices()
+    for device in devices:
+      if device.device_type is 'GPU':
+        tf.config.experimental.set_memory_growth(device, True)
+    
+    if len(devices) > 1:
+      jobs += len(devices) - 1
+    results = Parallel(n_jobs=int(jobs))(delayed(self.execute)(image, label, weights, self.efficient, classes, device) for image, label, device in zip(idx_data, idx_label, cycle(devices)))
 
     for values in results:
       total_loss += values[0]
       total_correct += values[1]
 
-<<<<<<< HEAD
     if verbose:
       sys.stdout.write("\033[F")
       sys.stdout.write("\033[K")
       print(f"The loss is {total_loss / batch[0].shape[0]} at [{iteration}] with accuracy {total_correct / batch[0].shape[0]} ")
 
-=======
-    # for image, label in zip(idx_data, idx_label):
-    #   result = self.qcircuit.execute(image, weights=weights, efficient=self.efficient)
-    #   loss, correct = self.loss(result, label, classes)
-    #   total_loss += loss
-    #   total_correct += correct
-
-    #   if verbose:
-    #     iteration += 1
-    #     sys.stdout.write("\033[F")
-    #     sys.stdout.write("\033[K")
-    #     print(f"The loss is {loss} at [{iteration}]")
->>>>>>> 46b72181258a571a30801468984fe46500667558
     return (total_loss / batch[0].shape[0]), total_correct
 
   def train(self, output_results: bool = False):

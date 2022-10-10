@@ -10,7 +10,7 @@ from qiskit import Aer
 from qiskit_aer import AerError
 from qiskit.quantum_info.operators.predicates import (is_hermitian_matrix,is_unitary_matrix)
 
-tf.config.set_visible_devices([], 'GPU')
+# tf.config.set_visible_devices([], 'GPU')
 
 class QuantumOperator():
   def __init__(self, 
@@ -100,12 +100,13 @@ class QuantumOperator():
                     filename: str = "qiskit_circuit", 
                     shots: int = 512,
                     weights: tf.Tensor = None,
-                    efficient: bool = False) -> (Any or np.ndarray):
+                    efficient: bool = False,
+                    device: str = "/physical_device:CPU:0") -> (Any or np.ndarray):
 
     if image is None:
       sys.exit("This function did not receive an image")
     
-    
+    tf.device(device)
     if efficient:
       return self.efficient_circuit(image, backend, draw, output_format, filename, shots, weights)
     else:
@@ -120,7 +121,6 @@ class QuantumOperator():
                           filename: str = "qiskit_circuit", 
                           shots: int = 512,
                           weights: tf.Tensor = None):
-
     self.weights = tf.random.normal((self.circuit_dimension - 1, self.unitary_dimension ** 2)) if weights is None else weights
 
     feat_map = self.feature_map(image.numpy().flatten())
