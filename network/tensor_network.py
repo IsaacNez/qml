@@ -85,17 +85,7 @@ class Network():
       sys.stdout.write("\033[F")
       sys.stdout.write("\033[K")
       print(f"The loss is {total_loss / batch[0].shape[0]} at [{iteration}] with accuracy {total_correct / batch[0].shape[0]} ")
-    # for image, label in zip(idx_data, idx_label):
-    #   result = self.qcircuit.execute(image, weights=weights, efficient=self.efficient)
-    #   loss, correct = self.loss(result, label, classes)
-    #   total_loss += loss
-    #   total_correct += correct
 
-    #   if verbose:
-    #     iteration += 1
-    #     sys.stdout.write("\033[F")
-    #     sys.stdout.write("\033[K")
-    #     print(f"The loss is {loss} at [{iteration}]")
     return (total_loss / batch[0].shape[0]), total_correct
 
   def train(self, output_results: bool = False):
