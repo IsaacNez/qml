@@ -3,6 +3,7 @@ from typing import *
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import sys
+import os
 
 def generate_random_int(len: int, start: int = 0) -> int:
   return np.random.randint(len - start) + start
@@ -38,6 +39,7 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
     plt.show(block=False)
     plt.close()
   else:
-    plt.savefig(filename, format="png")
+    output_path = os.path.abspath("output/")
+    plt.savefig(os.path.join(output_path, filename), format="png")
 
   

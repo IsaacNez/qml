@@ -9,6 +9,11 @@ import utils.utils as tl
 from joblib import Parallel, delayed
 from itertools import cycle
 
+devices = tf.config.list_physical_devices()
+for device in devices:
+  if device.device_type == 'GPU':
+    tf.config.experimental.set_memory_growth(device, True)
+
 # tf.config.set_visible_devices([], 'GPU')
 
 class Network():
@@ -77,10 +82,6 @@ class Network():
     total_loss, total_correct, iteration = 0.0, 0, 0
     
     jobs = os.cpu_count()
-    devices = tf.config.list_physical_devices()
-    for device in devices:
-      if device.device_type is 'GPU':
-        tf.config.experimental.set_memory_growth(device, True)
     
     if len(devices) > 1:
       jobs += len(devices) - 1
@@ -140,22 +141,23 @@ class Network():
 
         self.weights = self.weights + spsa_v
 
-        epoch_correct += correct
-
-        num_batch += 1
         
+        if output_results:
+          tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"loss_{self.image_size}x{self.image_size}.png")
+          tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label="SPSA Loss +alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L1_{self.image_size}x{self.image_size}.png")
+          tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label="SPSA Loss -alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L2_{self.image_size}x{self.image_size}.png")
+          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L +alpha", save_plot=True, filename=f"accuracy_L1_{self.image_size}x{self.image_size}.png")
+          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L -alpha", save_plot=True, filename=f"accuracy_L2_{self.image_size}x{self.image_size}.png")
+
+        epoch_correct += correct
+        num_batch += 1
+
+      if output_results:
+        tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, filename=f"accuracy_{self.image_size}x{self.image_size}.png")  
       
       if self.enable_log:
         print(f"The accuracy at epoch {epoch} is {epoch_correct}/ {self.dataset.get_dataset_size()} = {epoch_correct / self.dataset.get_dataset_size()}")
       self.accuracy.append(epoch_correct / self.dataset.get_dataset_size())
-  
-    if output_results:
-      tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, filename=f"accuracy_{self.image_size}x{self.image_size}.png")
-      tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"loss_{self.image_size}x{self.image_size}.png")
-      tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label="SPSA Loss +alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L1_{self.image_size}x{self.image_size}.png")
-      tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label="SPSA Loss -alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L2_{self.image_size}x{self.image_size}.png")
-      tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L +alpha", save_plot=True, filename=f"accuracy_L1_{self.image_size}x{self.image_size}.png")
-      tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L -alpha", save_plot=True, filename=f"accuracy_L2_{self.image_size}x{self.image_size}.png")
 
 
 if __name__ == '__main__':
