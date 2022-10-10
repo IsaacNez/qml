@@ -153,12 +153,12 @@ class Network():
         print(f"Batch: {num_batch}")
         delta = tfp.distributions.Bernoulli(probs=0.5, dtype=tf.float32).sample(sample_shape=(self.circuit_dim - 1, self.unitary_dim ** 2) if not self.efficient else (self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2))
         # delta = tf.random.normal((self.circuit_dim - 1, self.unitary_dim ** 2))
-        weights_neg, weights_pos = self.weights - beta_k * delta, self.weights + beta_k * delta
+        weights_neg, weights_pos = self.weights - alpha_k * delta, self.weights + alpha_k * delta
 
         l_tilde_1, correct = self.spsa_loss(batch, weights_pos, self.classes, True, "L1 Loss")
         l_tilde_2, correct_2 = self.spsa_loss(batch, weights_neg, self.classes, True, "L2 Loss")
 
-        g = (l_tilde_1 - l_tilde_2) / (2 * beta_k)
+        g = (l_tilde_1 - l_tilde_2) / (2 * alpha_k)
         
         self.loss_g.append(g)
         self.loss_l1.append(l_tilde_1)
@@ -167,17 +167,17 @@ class Network():
         self.correct_l2.append(correct_2 / batch[0].shape[0])
         # if self.enable_log:
         #   print(f"The loss g is {self.loss_g}, compared to +alpha {self.loss_l1} and -alpha {self.loss_l2} with acc {correct / batch[0].shape[0]} and {correct_2 / batch[0].shape[0]} respectively")
-        spsa_v = self.param_gamma * spsa_v - g * alpha_k * delta
+        spsa_v = self.param_gamma * spsa_v - g * beta_k * tf.math.reciprocal_no_nan(delta)
 
         self.weights = self.weights + spsa_v
 
         
         if output_results:
-          tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"loss_{self.image_size}x{self.image_size}.png", marker='o')
-          tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label="SPSA Loss +alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L1_{self.image_size}x{self.image_size}.png", marker='o')
-          tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label="SPSA Loss -alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L2_{self.image_size}x{self.image_size}.png", marker='o')
-          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L +alpha", save_plot=True, filename=f"accuracy_L1_{self.image_size}x{self.image_size}.png", marker='o')
-          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L -alpha", save_plot=True, filename=f"accuracy_L2_{self.image_size}x{self.image_size}.png", marker='o')
+          tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"loss_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label="SPSA Loss +alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label="SPSA Loss -alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L +alpha", save_plot=True, filename=f"accuracy_L1_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L -alpha", save_plot=True, filename=f"accuracy_L2_{self.image_size}x{self.image_size}.png", marker='.')
 
         epoch_correct += int((correct + correct_2)/2)
         num_batch += 1
@@ -195,8 +195,8 @@ class Network():
 
 if __name__ == '__main__':
   image_size = 8
-  classes = {0: "1", 1: "0"}
-  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=30, efficient=True, batch=222, shuffle=True, samples=-1, shots=1024)
+  classes = {0: "1", 4: "0"}
+  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=2, efficient=True, batch=10, shuffle=True, samples=200, shots=1024)
   model.train(output_results=True)
   model.predict()
 
