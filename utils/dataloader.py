@@ -18,7 +18,8 @@ class Dataset():
               enable_log: bool = False,
               filter: bool = False,
               samples: int = 100,
-              filter_by: dict = None) -> 'Dataset':
+              filter_by: dict = None,
+              shuffle: bool = False) -> 'Dataset':
     """ Download the MNIST Dataset to be used for
         training, test, and validation.
     
@@ -62,6 +63,12 @@ class Dataset():
       self.image_train, self.label_train = self.image_train[idxs_train], self.label_train[idxs_train]
       self.image_test, self.label_test = self.image_test[idxs_test], self.label_test[idxs_test]
     
+    if shuffle:
+      np.random.shuffle(self.image_train)
+      np.random.shuffle(self.image_test)
+      np.random.shuffle(self.label_test)
+      np.random.shuffle(self.label_train)
+
     if samples > 0:
       self.image_train, self.label_train = self.image_train[:int(0.8*samples)], self.label_train[:int(0.8*samples)]
       self.image_test, self.label_test = self.image_test[:int(0.2*samples)], self.label_test[:int(0.2*samples)]
@@ -129,19 +136,21 @@ class Dataset():
 
     return cropped, rotated, cropped_test, rotated_test
 
-  def get_batch(self, batch: int = 222, shuffle: bool = False) -> Any:
-    if shuffle:
-      indeces = np.arange(self.image_train.shape[0])
-      np.random.shuffle(indeces)
-
+  def get_batch(self, batch: int = 222) -> Any:
     for idx in range(0, self.image_train.shape[0], batch):
       lim = min(idx + batch, self.image_train.shape[0])
-      idxs = indeces[idx:lim] if shuffle else slice(idx, lim)
-      image = self.image_train.numpy()
-      yield tf.convert_to_tensor(image[idxs]), self.label_train[idxs]
+      idxs = slice(idx, lim)
+      yield self.image_train[idxs], self.label_train[idxs]
       
   def get_image(self):
     return self.image_train[0]
 
   def get_dataset_size(self):
     return self.image_train.shape[0]
+
+  def get_test_samples(self):
+    for image, label in zip(self.image_test, self.label_test):
+      yield image, label
+  
+  def get_test_dataset_size(self):
+    return self.image_test.shape[0]

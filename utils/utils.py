@@ -20,16 +20,17 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
                   y_label: str = None,
                   title: str = None,
                   save_plot: bool = False,
-                  filename: str = None) -> None:
+                  filename: str = None,
+                  **kwargs) -> None:
 
   if x_value is None and y_value is None:
     sys.exit("Please provide at least the y_value")
   
   plt.figure()
   if x_value is not None:
-    plt.plot(x_value, y_value)
+    plt.plot(x_value, y_value, **kwargs)
   else:
-    plt.plot(y_value)
+    plt.plot(y_value, **kwargs)
   
   plt.title("Generic Plot Title" if title is None else title)
   plt.xlabel("X-axis values" if x_label is None else x_label)
@@ -39,6 +40,7 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
     plt.show(block=False)
     plt.close()
   else:
+    
     output_path = os.path.abspath("output/")
     plt.savefig(os.path.join(output_path, filename), format="png")
 
