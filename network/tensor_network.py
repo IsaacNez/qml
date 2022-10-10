@@ -196,7 +196,7 @@ class Network():
 if __name__ == '__main__':
   image_size = 8
   classes = {0: "1", 4: "0"}
-  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=2, efficient=True, batch=10, shuffle=True, samples=200, shots=1024)
+  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=30, efficient=True, batch=222, shuffle=True, samples=-1, shots=1024)
   model.train(output_results=True)
   model.predict()
 
