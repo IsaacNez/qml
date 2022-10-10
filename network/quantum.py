@@ -8,9 +8,7 @@ import math as m
 import qiskit
 from qiskit import Aer
 from qiskit_aer import AerError
-from qiskit.quantum_info.operators.predicates import (is_hermitian_matrix,
-                                                      is_unitary_matrix)
-
+from qiskit.quantum_info.operators.predicates import (is_hermitian_matrix,is_unitary_matrix)
 
 tf.config.set_visible_devices([], 'GPU')
 
@@ -106,6 +104,7 @@ class QuantumOperator():
 
     if image is None:
       sys.exit("This function did not receive an image")
+    
     
     if efficient:
       return self.efficient_circuit(image, backend, draw, output_format, filename, shots, weights)
