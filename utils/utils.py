@@ -26,7 +26,7 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
   if x_value is None and y_value is None:
     sys.exit("Please provide at least the y_value")
   
-  plt.figure()
+  plt.figure(figsize=[19.2, 14.4])
   if x_value is not None:
     plt.plot(x_value, y_value, **kwargs)
   else:
@@ -40,8 +40,8 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
     plt.show(block=False)
     plt.close()
   else:
-    
     output_path = os.path.abspath("output/")
     plt.savefig(os.path.join(output_path, filename), format="png")
+    plt.close()
 
   

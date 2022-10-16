@@ -119,7 +119,7 @@ class Network():
       prediction_class = max(prediction.items(), key=operator.itemgetter(1))[0]
       prediction_label = list(self.classes.keys())[list(self.classes.values()).index(prediction_class)]
       correct_label = sample[1]
-      print(f"<{prediction}>:Pred. class=[{prediction_class}], Correct Label=[{correct_label}], Pred. Label=[{prediction_label}]", end="")
+      print(f"<{prediction}>::Pred. class=[{prediction_class}], Correct Label=[{correct_label}], Pred. Label=[{prediction_label}]", end="")
       if prediction_label == correct_label:
         print(" \u2714")
         prediction_correct += 1
@@ -151,14 +151,19 @@ class Network():
       num_batch = 0
       for batch in self.dataset.get_batch(batch=self.batch):
         print(f"Batch: {num_batch}")
+        b = self.param_b
+        mean = tf.math.reduce_mean(batch[0]) / (2*b)
+        a = self.param_a/mean
+        alpha_k = a / (epoch + mean + 1) ** self.param_s
+        beta_k  = b / (epoch + 1) ** self.param_t
         delta = tfp.distributions.Bernoulli(probs=0.5, dtype=tf.float32).sample(sample_shape=(self.circuit_dim - 1, self.unitary_dim ** 2) if not self.efficient else (self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2))
         # delta = tf.random.normal((self.circuit_dim - 1, self.unitary_dim ** 2))
-        weights_neg, weights_pos = self.weights - alpha_k * delta, self.weights + alpha_k * delta
+        weights_neg, weights_pos = self.weights - beta_k * delta, self.weights + beta_k * delta
 
         l_tilde_1, correct = self.spsa_loss(batch, weights_pos, self.classes, True, "L1 Loss")
         l_tilde_2, correct_2 = self.spsa_loss(batch, weights_neg, self.classes, True, "L2 Loss")
 
-        g = (l_tilde_1 - l_tilde_2) / (2 * alpha_k)
+        g = (l_tilde_1 - l_tilde_2) / (2 * beta_k)
         
         self.loss_g.append(g)
         self.loss_l1.append(l_tilde_1)
@@ -167,7 +172,7 @@ class Network():
         self.correct_l2.append(correct_2 / batch[0].shape[0])
         # if self.enable_log:
         #   print(f"The loss g is {self.loss_g}, compared to +alpha {self.loss_l1} and -alpha {self.loss_l2} with acc {correct / batch[0].shape[0]} and {correct_2 / batch[0].shape[0]} respectively")
-        spsa_v = self.param_gamma * spsa_v - g * beta_k * tf.math.reciprocal_no_nan(delta)
+        spsa_v = self.param_gamma * spsa_v - g * alpha_k * delta
 
         self.weights = self.weights + spsa_v
 
@@ -195,8 +200,19 @@ class Network():
 
 if __name__ == '__main__':
   image_size = 8
-  classes = {0: "1", 4: "0"}
-  model = Network(image_size=image_size, circuit_dim=image_size*image_size, classes=classes, enable_log=True, draw_circuits=False, epochs=30, efficient=True, batch=222, shuffle=True, samples=-1, shots=1024)
+  classes = {0: "1", 1: "0"}
+  model = Network(image_size=image_size, 
+                  circuit_dim=image_size*image_size, 
+                  classes=classes, enable_log=True, 
+                  draw_circuits=False, epochs=10, 
+                  efficient=True, batch=222, 
+                  shuffle=False, samples=-1, 
+                  shots=1024,
+                  param_A=0,
+                  param_a=0.628,
+                  param_s=0.602,
+                  param_t=0.101,
+                  param_b=0.2)
   model.train(output_results=True)
   model.predict()
 

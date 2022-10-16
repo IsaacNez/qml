@@ -52,13 +52,19 @@ class Dataset():
 
     (self.image_train, self.label_train), (self.image_test, self.label_test) = tf.keras.datasets.mnist.load_data()
 
+    even_samples = samples - samples % 2
+    half_idx = even_samples // 2
+    train_idx = int(0.8*half_idx) if samples > 0 else None
+    test_idx = int(0.2*half_idx) if samples > 0 else None
+
+
     if filter:
       keys = list(filter_by.keys())
 
-      idxs_train = np.append(tf.where(tf.equal(self.label_train, keys[0])).numpy(), 
-                              tf.where(tf.equal(self.label_train, keys[1])).numpy())
-      idxs_test = np.append(tf.where(tf.equal(self.label_test, keys[0])).numpy(), 
-                                      tf.where(tf.equal(self.label_test, keys[1])).numpy())
+      idxs_train = np.append(tf.where(tf.equal(self.label_train, keys[0])).numpy()[:train_idx], 
+                              tf.where(tf.equal(self.label_train, keys[1])).numpy()[:train_idx])
+      idxs_test = np.append(tf.where(tf.equal(self.label_test, keys[0])).numpy()[:test_idx], 
+                                    tf.where(tf.equal(self.label_test, keys[1])).numpy()[:test_idx])
 
       self.image_train, self.label_train = self.image_train[idxs_train], self.label_train[idxs_train]
       self.image_test, self.label_test = self.image_test[idxs_test], self.label_test[idxs_test]
@@ -68,10 +74,6 @@ class Dataset():
       np.random.shuffle(self.image_test)
       np.random.shuffle(self.label_test)
       np.random.shuffle(self.label_train)
-
-    if samples > 0:
-      self.image_train, self.label_train = self.image_train[:int(0.8*samples)], self.label_train[:int(0.8*samples)]
-      self.image_test, self.label_test = self.image_test[:int(0.2*samples)], self.label_test[:int(0.2*samples)]
 
     self.image_train, self.image_test = self.image_train[..., np.newaxis] / 255.0, self.image_test[..., np.newaxis] / 255.0
 
