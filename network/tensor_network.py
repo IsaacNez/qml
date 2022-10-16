@@ -204,7 +204,7 @@ if __name__ == '__main__':
   model = Network(image_size=image_size, 
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
-                  draw_circuits=False, epochs=10, 
+                  draw_circuits=False, epochs=30, 
                   efficient=True, batch=222, 
                   shuffle=False, samples=-1, 
                   shots=1024,
