@@ -79,7 +79,7 @@ class Network():
     return max(p_max_false - p_label + self.param_lambda, 0) ** self.param_eta, 1 if p_result == p_label else 0
 
   def execute(self, image, label, weights, efficient, classes, device):
-    result = self.qcircuit.execute(image, weights=weights, efficient=efficient, device=device, shots=self.shots)
+    result = self.qcircuit.execute(image, weights=weights, efficient=efficient, device=device, shots=self.shots, backend="qasm_simulator")
     loss, correct = self.loss(result, label, classes)
     return loss, correct
 
@@ -199,14 +199,14 @@ class Network():
 
 
 if __name__ == '__main__':
-  image_size = 8
+  image_size = 4
   classes = {0: "1", 1: "0"}
   model = Network(image_size=image_size, 
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
                   draw_circuits=False, epochs=30, 
-                  efficient=True, batch=222, 
-                  shuffle=False, samples=-1, 
+                  efficient=False, batch=12, 
+                  shuffle=False, samples=600, 
                   shots=1024,
                   param_A=0,
                   param_a=0.628,
