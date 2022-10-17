@@ -79,7 +79,7 @@ class Network():
     return max(p_max_false - p_label + self.param_lambda, 0) ** self.param_eta, 1 if p_result == p_label else 0
 
   def execute(self, image, label, weights, efficient, classes, device):
-    result = self.qcircuit.execute(image, weights=weights, efficient=efficient, device=device, shots=self.shots, backend="qasm_simulator")
+    result = self.qcircuit.execute(image, weights=weights, efficient=efficient, device=device, shots=self.shots)
     loss, correct = self.loss(result, label, classes)
     return loss, correct
 

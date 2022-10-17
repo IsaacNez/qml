@@ -202,22 +202,21 @@ class QuantumOperator():
       quantum_circuit.draw(output=output_format, filename=filename)
     
     try:
-
-      circuit_backend = Aer.get_backend(backend, device='GPU')
-      if self.debug_log:
-        print(circuit_backend.available_devices(), end="\n\n")
-      if 'GPU' in circuit_backend.available_devices() and self.enable_gpu and backend == "aer_simulator":
-        if self.show_gpu_support:
-          print(f"The backend {backend} supports GPU. We are using it!\n")
+      if backend == "aer_simulator":
+        circuit_backend = Aer.get_backend(backend, device='GPU')
+        if 'GPU' in circuit_backend.available_devices() and self.enable_gpu:
+          if self.show_gpu_support:
+            print(f"The backend {backend} supports GPU. We are using it!")
           self.show_gpu_support = False
-        counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
-        return counts
+          counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
+          return counts
+        else:
+          circuit_backend = Aer.get_backend(backend)
+          counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
+          return counts
       else:
-        if self.show_gpu_support:
-          print(f"The backend {backend} supports GPU but we chose the CPU!\n")
-          self.show_gpu_support = False
-        circuit_backend_cpu = Aer.get_backend(backend, device='CPU')
-        counts = qiskit.execute(quantum_circuit, circuit_backend_cpu, shots=shots).result().get_counts()
+        circuit_backend = Aer.get_backend(backend)
+        counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
         return counts
     except AerError as e:
       print(f"This module generated the following error [{e}]")
