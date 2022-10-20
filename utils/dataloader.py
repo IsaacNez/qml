@@ -49,6 +49,7 @@ class Dataset():
 
     self.image_size = image_size
     self.batch = batch
+    self.shuffle = shuffle
 
     (self.image_train, self.label_train), (self.image_test, self.label_test) = tf.keras.datasets.mnist.load_data()
 
@@ -68,14 +69,8 @@ class Dataset():
 
       self.image_train, self.label_train = self.image_train[idxs_train], self.label_train[idxs_train]
       self.image_test, self.label_test = self.image_test[idxs_test], self.label_test[idxs_test]
-    
-    if shuffle:
-      np.random.shuffle(self.image_train)
-      np.random.shuffle(self.image_test)
-      np.random.shuffle(self.label_test)
-      np.random.shuffle(self.label_train)
 
-    self.image_train, self.image_test = self.image_train[..., np.newaxis] / 255.0, self.image_test[..., np.newaxis] / 255.0
+    self.image_train, self.image_test = self.image_train[..., np.newaxis] / 255.0 , self.image_test[..., np.newaxis] / 255.0
 
     image_train, image_test = tf.image.resize(self.image_train, (self.image_size, self.image_size)), tf.image.resize(self.image_test, (self.image_size, self.image_size))
 
@@ -92,6 +87,7 @@ class Dataset():
     else:
       self.image_train, self.image_test = image_train, image_test
 
+    self.indices = tf.range(start=0, limit=self.image_train.shape[0], dtype=tf.int32)
     if enable_log:
       print(f"The resulting training dataset has {self.image_train.shape[0]} images and the test one has {self.image_test.shape[0]} images")
 
@@ -139,11 +135,20 @@ class Dataset():
     return cropped, rotated, cropped_test, rotated_test
 
   def get_batch(self, batch: int = 222) -> Any:
+    self.shuffle_train_dataset()
+
     for idx in range(0, self.image_train.shape[0], batch):
       lim = min(idx + batch, self.image_train.shape[0])
       idxs = slice(idx, lim)
-      yield self.image_train[idxs], self.label_train[idxs]
-      
+      yield tf.convert_to_tensor(self.image_train[idxs]), self.label_train[idxs]
+
+  def shuffle_train_dataset(self):
+    if self.shuffle:
+      self.indices = tf.random.shuffle(self.indices)
+
+      self.image_train = tf.gather(self.image_train, self.indices).numpy() 
+      self.label_train = tf.gather(self.label_train, self.indices).numpy()
+
   def get_image(self):
     return self.image_train[0]
 
