@@ -18,7 +18,6 @@ class QuantumOperator():
               circuit_dimension: int = 16,
               unitary_dimension: int = 4,
               debug_log: bool = False,
-              weights: tf.Tensor = None, 
               draw_circuit: bool = False, 
               show_gpu_support: bool = False,
               enable_gpu: bool = True) -> 'QuantumOperator':
@@ -88,9 +87,12 @@ class QuantumOperator():
       unitary = tf.linalg.expm(1j*self.hermitian_matrix(weight, unitary_dimension))
       assert is_unitary_matrix(unitary)
       unitaries.append(unitary)
+      del unitary
     
     U = tf.convert_to_tensor(unitaries, dtype=tf.complex128)
     
+    del unitaries
+    gc.collect()
     return U
   
 
@@ -102,6 +104,7 @@ class QuantumOperator():
                     shots: int = 512,
                     weights: tf.Tensor = None,
                     efficient: bool = False,
+                    circuit_type: str = 'normal',
                     device: str = "/physical_device:CPU:0") -> (Any or np.ndarray):
 
     if image is None:
@@ -115,18 +118,28 @@ class QuantumOperator():
       self.weights = weights
 
     feature_map = self.feature_map(image.numpy().flatten())
-    unitaries = self.unitary_matrices(unitary_dimension=self.unitary_dimension**2).numpy() if efficient else self.unitary_matrices().numpy()
 
-    if efficient:
-      quantum_circuit = self.gen_efficient_circuit(feature_map, unitaries)
+    if circuit_type == 'normal' or circuit_type == 'experimental':
+      unitaries = self.unitary_matrices().numpy()
     else:
+      unitaries = self.unitary_matrices(unitary_dimension=self.unitary_dimension**2).numpy()
+
+    if circuit_type == 'efficient':
+      quantum_circuit = self.gen_efficient_circuit(feature_map, unitaries)
+    elif circuit_type == 'normal':
       quantum_circuit = self.gen_normal_circuit(feature_map, unitaries)
+    elif circuit_type == 'experimental':
+      quantum_circuit = self.gen_experimental_circuit(feature_map, unitaries)
+    else:
+      raise ValueError(f"circuit_type can only be normal, efficient or experimental. We received: {circuit_type}")
 
     if self.draw_circuit or draw:
-      quantum_circuit.draw(output=output_format, filename=filename).close()
+      fig = quantum_circuit.draw(output=output_format, filename=filename)
+      fig.clf()
 
     try:
       if backend == "aer_simulator":
+        circuit_backend = Aer.get_backend(backend)
         if 'GPU' in circuit_backend.available_devices() and self.enable_gpu:
           circuit_backend = Aer.get_backend(backend, device='GPU')
           if self.show_gpu_support:
@@ -188,3 +201,33 @@ class QuantumOperator():
     quantum_circuit.measure([0], [0])
 
     return quantum_circuit
+  
+  def gen_experimental_circuit(self, features, unitaries):
+    quantum_circuit = qiskit.QuantumCircuit(4,1)
+
+    for index in range(4):
+      quantum_circuit.initialize(features[index], index)
+    
+    quantum_circuit.unitary(unitaries[0], quantum_circuit.qubits[0:2], f'$U_{0}$')
+    quantum_circuit.unitary(unitaries[1], quantum_circuit.qubits[2:4], f'$U_{1}$')
+
+    layers = (self.circuit_dimension - 4) // 2
+
+    reset_indexes = [[0,2],[1,3]]
+
+    idx = 0
+    for index in range(0, layers):
+      quantum_circuit.reset(reset_indexes[idx%2][0])
+      quantum_circuit.reset(reset_indexes[idx%2][1])
+      quantum_circuit.initialize(features[2*index + 4], reset_indexes[idx%2][0])
+      quantum_circuit.initialize(features[2*index + 5], reset_indexes[idx%2][0])
+      quantum_circuit.unitary(unitaries[2*index + 2], quantum_circuit.qubits[0:2], f'$U_{{{index + 2}}}$')
+      quantum_circuit.unitary(unitaries[2*index + 3], quantum_circuit.qubits[2:4], f'$U_{{{index + 3}}}$')
+      # idx += 1
+    
+    quantum_circuit.unitary(unitaries[-1], [quantum_circuit.qubits[1],quantum_circuit.qubits[3]], f'$U_{{{index + 4}}}$')
+
+    quantum_circuit.measure([3], [0])
+
+    return quantum_circuit
+
