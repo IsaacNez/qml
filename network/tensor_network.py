@@ -11,6 +11,7 @@ from joblib import Parallel, delayed
 from itertools import cycle
 import gc
 import pickle
+import time
 
 devices = tf.config.list_physical_devices()
 for device in devices:
@@ -41,6 +42,7 @@ class Network():
                       efficient: bool = False,
                       circuit_type: str = 'normal',
                       shuffle: bool = False,
+                      perf_metrics: bool = False,
                       samples: int = -1):
   
     self.image_size         = image_size
@@ -64,6 +66,8 @@ class Network():
     self.classes            = classes
     self.efficient          = efficient
     self.shuffle            = shuffle
+    self.perf_metrics       = perf_metrics
+
 
     if self.circuit_type == 'normal' or self.circuit_type == 'experimental':
       self.shape = (self.circuit_dim - 1, self.unitary_dim ** 2)
@@ -198,9 +202,14 @@ class Network():
         delta = tfp.distributions.Binomial(batch[0].shape[0], probs=0.5).sample(sample_shape=self.shape)
 
         weights_neg, weights_pos = self.weights - alpha_k * delta, self.weights + alpha_k * delta
-
+        if self.perf_metrics:
+          start_batch = time.time()
+        
         l_tilde_1, correct = self.spsa_loss(batch, weights_pos, self.classes, True, "L1 Loss")
         l_tilde_2, correct_2 = self.spsa_loss(batch, weights_neg, self.classes, True, "L2 Loss")
+        
+        if self.perf_metrics:
+          print(f"Total batch time is: {time.time() - start_batch}")  
 
         g = (l_tilde_1 - l_tilde_2) / (2*alpha_k)
         
@@ -249,7 +258,7 @@ if __name__ == '__main__':
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
                   draw_circuits=False, epochs=100, 
-                  efficient=True, batch=13, 
+                  efficient=True, batch=36, 
                   shuffle=True, samples=5000, 
                   shots=1025,
                   circuit_type='experimental',
