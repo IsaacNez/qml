@@ -181,6 +181,8 @@ class Network():
     self.correct_l1 = []
     self.correct_l2 = []
 
+    total_batches = self.dataset.get_dataset_size() // self.batch
+
     for epoch in range(self.epochs + 1):
       alpha_k = self.param_a / (epoch + self.param_A + 1) ** self.param_s
       beta_k  = self.param_b / (epoch + 1) ** self.param_t
@@ -225,7 +227,7 @@ class Network():
         self.weights -= g *beta_k* delta
 
         
-        if output_results:
+        if output_results and total_batches // 2 == num_batch:
           tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"circuit_{self.circuit_type}_loss_{self.image_size}x{self.image_size}.png", marker='.')
           tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda+\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
           tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda-\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
@@ -258,8 +260,8 @@ if __name__ == '__main__':
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
                   draw_circuits=False, epochs=100, 
-                  efficient=True, batch=36, 
-                  shuffle=True, samples=5000, 
+                  efficient=True, batch=52, 
+                  shuffle=True, samples=6000, 
                   shots=1025,
                   circuit_type='experimental',
                   param_a=0.05,
@@ -269,10 +271,12 @@ if __name__ == '__main__':
                   param_eta=1,
                   param_s=0.602,
                   param_t=0.101,
-                  param_b=0.01
+                  param_b=0.01,
+                  perf_metrics=True
                   )
   model.train(output_results=True)
   model.predict()
+  model.save_model()
 
 
 # d = Dataset(image_size=8, enable_transformations=True, enable_log=True, filter=True, filter_by={3: "1", 7: "0"})
