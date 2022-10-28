@@ -11,6 +11,10 @@ from joblib import Parallel, delayed
 from itertools import cycle
 import gc
 import pickle
+<<<<<<< HEAD
+=======
+import time
+>>>>>>> 13c06391614116986588f582c74a66abbc2b1c6a
 
 devices = tf.config.list_physical_devices()
 for device in devices:
@@ -41,6 +45,7 @@ class Network():
                       efficient: bool = False,
                       circuit_type: str = 'normal',
                       shuffle: bool = False,
+                      perf_metrics: bool = False,
                       samples: int = -1):
   
     self.image_size         = image_size
@@ -64,6 +69,17 @@ class Network():
     self.classes            = classes
     self.efficient          = efficient
     self.shuffle            = shuffle
+    self.perf_metrics       = perf_metrics
+
+
+    if self.circuit_type == 'normal' or self.circuit_type == 'experimental':
+      self.shape = (self.circuit_dim - 1, self.unitary_dim ** 2)
+    elif self.circuit_type == 'efficient':
+      self.shape = (self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2)
+    else:
+      raise ValueError(f"circuit_type can only be normal, efficient or experimental. We received: {circuit_type}")
+
+    self.weights = tf.random.uniform(self.shape)
 
     if self.circuit_type == 'normal' or self.circuit_type == 'experimental':
       self.shape = (self.circuit_dim - 1, self.unitary_dim ** 2)
@@ -177,6 +193,8 @@ class Network():
     self.correct_l1 = []
     self.correct_l2 = []
 
+    total_batches = self.dataset.get_dataset_size() // self.batch
+
     for epoch in range(self.epochs + 1):
       alpha_k = self.param_a / (epoch + self.param_A + 1) ** self.param_s
       beta_k  = self.param_b / (epoch + 1) ** self.param_t
@@ -198,9 +216,14 @@ class Network():
         delta = tfp.distributions.Binomial(batch[0].shape[0], probs=0.5).sample(sample_shape=self.shape)
 
         weights_neg, weights_pos = self.weights - alpha_k * delta, self.weights + alpha_k * delta
-
+        if self.perf_metrics:
+          start_batch = time.time()
+        
         l_tilde_1, correct = self.spsa_loss(batch, weights_pos, self.classes, True, "L1 Loss")
         l_tilde_2, correct_2 = self.spsa_loss(batch, weights_neg, self.classes, True, "L2 Loss")
+        
+        if self.perf_metrics:
+          print(f"Total batch time is: {time.time() - start_batch} seconds")  
 
         g = (l_tilde_1 - l_tilde_2) / (2*alpha_k)
         
@@ -216,12 +239,12 @@ class Network():
         self.weights -= g *beta_k* delta
 
         
-        if output_results:
-          tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"loss_{self.image_size}x{self.image_size}.png", marker='.')
-          tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda+\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
-          tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda-\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
-          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy (%)", title=r"Accuracy for $L(\Lambda+\alpha\Delta$)", save_plot=True, filename=f"accuracy_L1_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
-          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy (%)", title=r"Accuracy for $L(\Lambda-\alpha\Delta$)", save_plot=True, filename=f"accuracy_L2_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
+        if output_results and total_batches // 2 == num_batch:
+          tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"circuit_{self.circuit_type}_loss_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda+\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda-\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy (%)", title=r"Accuracy for $L(\Lambda+\alpha\Delta$)", save_plot=True, filename=f"circuit_{self.circuit_type}accuracy_L1_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
+          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy (%)", title=r"Accuracy for $L(\Lambda-\alpha\Delta$)", save_plot=True, filename=f"circuit_{self.circuit_type}accuracy_L2_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
 
         epoch_correct += int((correct + correct_2)/2)
         num_batch += 1
@@ -239,18 +262,23 @@ class Network():
       self.accuracy.append(epoch_correct / self.dataset.get_dataset_size())
       
       if output_results:
-        tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, ylim=[0,1], filename=f"accuracy_{self.image_size}x{self.image_size}.png", marker='o')
+        tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, ylim=[0,1], filename=f"circuit_{self.circuit_type}accuracy_{self.image_size}x{self.image_size}.png", marker='o')
 
 
 if __name__ == '__main__':
-  image_size = 4
+  image_size = 8
   classes = {0: "1", 1: "0"}
   model = Network(image_size=image_size, 
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
                   draw_circuits=False, epochs=100, 
+<<<<<<< HEAD
                   efficient=True, batch=13, 
                   shuffle=True, samples=-1, 
+=======
+                  efficient=True, batch=52, 
+                  shuffle=True, samples=6000, 
+>>>>>>> 13c06391614116986588f582c74a66abbc2b1c6a
                   shots=1025,
                   circuit_type='experimental',
                   param_a=0.05,
@@ -260,10 +288,16 @@ if __name__ == '__main__':
                   param_eta=1,
                   param_s=0.602,
                   param_t=0.101,
+<<<<<<< HEAD
                   param_b=0.01
+=======
+                  param_b=0.01,
+                  perf_metrics=True
+>>>>>>> 13c06391614116986588f582c74a66abbc2b1c6a
                   )
   model.train(output_results=True)
   model.predict()
+  model.save_model()
 
 
 # d = Dataset(image_size=8, enable_transformations=True, enable_log=True, filter=True, filter_by={3: "1", 7: "0"})

@@ -41,7 +41,7 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
   if x_value is None and y_value is None:
     sys.exit("Please provide at least the y_value")
   
-  plt.figure(figsize=[40, 30])
+  plt.figure(figsize=[20, 15])
   if x_value is not None:
     plt.plot(x_value, y_value, **kwargs)
   else:
