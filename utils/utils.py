@@ -19,8 +19,11 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
                   x_label: str = None,
                   y_label: str = None,
                   title: str = None,
+                  fontsize: int = 18,
                   save_plot: bool = False,
                   filename: str = None,
+                  xlim: list = None,
+                  ylim: list = None,
                   **kwargs) -> None:
 
   if x_value is None and y_value is None:
@@ -32,10 +35,18 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
   else:
     plt.plot(y_value, **kwargs)
   
-  plt.title("Generic Plot Title" if title is None else title)
-  plt.xlabel("X-axis values" if x_label is None else x_label)
-  plt.ylabel("Y-axis values" if y_label is None else y_label)
+  plt.xticks(fontsize=fontsize)
+  plt.yticks(fontsize=fontsize)
+  plt.title("Generic Plot Title" if title is None else title, fontsize=fontsize)
+  plt.xlabel("X-axis values" if x_label is None else x_label, fontsize=fontsize)
+  plt.ylabel("Y-axis values" if y_label is None else y_label, fontsize=fontsize)
   
+  if xlim is not None:
+    plt.xlim(xlim)
+
+  if ylim is not None:
+    plt.ylim(ylim)
+
   if not save_plot and filename is None:
     plt.show(block=False)
     plt.close()

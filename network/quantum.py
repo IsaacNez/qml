@@ -9,6 +9,7 @@ import qiskit
 from qiskit import Aer
 from qiskit_aer import AerError
 from qiskit.quantum_info.operators.predicates import (is_hermitian_matrix,is_unitary_matrix)
+import gc
 
 # tf.config.set_visible_devices([], 'GPU')
 
@@ -84,7 +85,6 @@ class QuantumOperator():
     unitaries = []
     
     for weight in weights:
-      # self.hermitian_matrix(weight, unitary_dimension)
       unitary = tf.linalg.expm(1j*self.hermitian_matrix(weight, unitary_dimension))
       assert is_unitary_matrix(unitary)
       unitaries.append(unitary)
@@ -93,6 +93,7 @@ class QuantumOperator():
     
     return U
   
+
   def execute(self, image: tf.Tensor = None, 
                     backend: str = "aer_simulator", 
                     draw: bool = False,
@@ -107,28 +108,56 @@ class QuantumOperator():
       sys.exit("This function did not receive an image")
     
     tf.device(device)
-    if efficient:
-      return self.efficient_circuit(image, backend, draw, output_format, filename, shots, weights)
+
+    if weights is None:
+      self.weights = tf.random.normal((self.circuit_dimension - 3, (self.unitary_dimension * 2) ** 2) if efficient else (self.circuit_dimension - 1, self.unitary_dimension ** 2))
     else:
-      return self.normal_circuit(image, backend, draw, output_format, filename, shots, weights)
+      self.weights = weights
+
+    feature_map = self.feature_map(image.numpy().flatten())
+    unitaries = self.unitary_matrices(unitary_dimension=self.unitary_dimension**2).numpy() if efficient else self.unitary_matrices().numpy()
+
+    if efficient:
+      quantum_circuit = self.gen_efficient_circuit(feature_map, unitaries)
+    else:
+      quantum_circuit = self.gen_normal_circuit(feature_map, unitaries)
+
+    if self.draw_circuit or draw:
+      quantum_circuit.draw(output=output_format, filename=filename).close()
+
+    try:
+      if backend == "aer_simulator":
+        if 'GPU' in circuit_backend.available_devices() and self.enable_gpu:
+          circuit_backend = Aer.get_backend(backend, device='GPU')
+          if self.show_gpu_support:
+            print(f"The backend {backend} supports GPU. We are using it!")
+        else:
+          circuit_backend = Aer.get_backend(backend)
+          if self.show_gpu_support:
+            print(f"The backend {backend} supports GPU. We are ignoring it...")
+      else:
+        circuit_backend = Aer.get_backend(backend)
+        if self.show_gpu_support:
+            print(f"Your backend {backend} does not support GPU. We are ignoring it...")
+      
+      counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
+
+      del quantum_circuit
+      del feature_map
+      del unitaries
+      del circuit_backend
+      gc.collect()
+
+      return counts
+    except AerError as e:
+      print(f"This module generated the following error [{e}]")
+      return None
 
 
-  def normal_circuit(self,
-                          image: tf.Tensor = None, 
-                          backend: str = "aer_simulator", 
-                          draw: bool = False,
-                          output_format: str = "mpl",
-                          filename: str = "qiskit_circuit", 
-                          shots: int = 512,
-                          weights: tf.Tensor = None):
-    self.weights = tf.random.normal((self.circuit_dimension - 1, self.unitary_dimension ** 2)) if weights is None else weights
-
-    feat_map = self.feature_map(image.numpy().flatten())
-    U = self.unitary_matrices().numpy()
-
+  def gen_normal_circuit(self, features, unitaries):
     quantum_circuit = qiskit.QuantumCircuit(self.circuit_dimension, 1)
 
-    for index, feature  in enumerate(feat_map):
+    for index, feature in enumerate(features):
       quantum_circuit.initialize(feature, index)
     
     index = 0
@@ -136,88 +165,26 @@ class QuantumOperator():
       for lower in range((2**layer -1 if layer > 1 else layer), self.circuit_dimension, (2**(layer+1))):
         upper = lower + layer + 1 if layer < 2 else lower + 2**layer
 
-        quantum_circuit.unitary(U[index], [quantum_circuit.qubits[lower], quantum_circuit.qubits[upper]], f"$U_{{{index}}}$")
+        quantum_circuit.unitary(unitaries[index], [quantum_circuit.qubits[lower], quantum_circuit.qubits[upper]], f"$U_{{{index}}}$")
         index += 1
     
     quantum_circuit.measure([self.circuit_dimension - 1], [0])
-    
-    if self.draw_circuit or draw:
-      quantum_circuit.draw(output=output_format, filename=filename)
 
-    try:
-      if backend == "aer_simulator":
-        circuit_backend = Aer.get_backend(backend, device='GPU')
-        if 'GPU' in circuit_backend.available_devices() and self.enable_gpu:
-          if self.show_gpu_support:
-            print(f"The backend {backend} supports GPU. We are using it!")
-          self.show_gpu_support = False
-          counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
-          return counts
-        else:
-          circuit_backend = Aer.get_backend(backend)
-          counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
-          return counts
-      else:
-        circuit_backend = Aer.get_backend(backend)
-        counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
-        return counts
-    except AerError as e:
-      print(f"This module generated the following error [{e}]")
+    return quantum_circuit
 
-  
-  def efficient_circuit(self,
-                            image: tf.Tensor = None, 
-                            backend: str = "aer_simulator", 
-                            draw: bool = False,
-                            output_format: str = "mpl",
-                            filename: str = "qiskit_circuit", 
-                            shots: int = 512,
-                            weights: tf.Tensor = None):
-      
-    self.weights = tf.random.normal((self.circuit_dimension - 3, (self.unitary_dimension * 2) ** 2)) if weights is None else weights
-
-    if self.debug_log:
-      print(self.weights.shape)
-
-    feat_map = self.feature_map(image.numpy().flatten())
-    U = self.unitary_matrices(unitary_dimension=self.unitary_dimension**2).numpy()
-
+  def gen_efficient_circuit(self, features, unitaries):
     quantum_circuit = qiskit.QuantumCircuit(4, 1)
 
     for index in range(4):
-      quantum_circuit.initialize(feat_map[index], index)
+      quantum_circuit.initialize(features[index], index)
     
-    quantum_circuit.unitary(U[0], quantum_circuit.qubits[0:4], f'$U_{0}$')
+    quantum_circuit.unitary(unitaries[0], quantum_circuit.qubits[0:4], f'$U_{0}$')
 
-    if self.debug_log:
-      print(feat_map[1:].shape)
-    for index, feat in enumerate(feat_map[4:]):
+    for index, feat in enumerate(features[4:]):
       quantum_circuit.reset(3)
       quantum_circuit.initialize(feat, 3)
-      quantum_circuit.unitary(U[index + 1], quantum_circuit.qubits[0:4], f"$U_{{{index + 1}}}$")
+      quantum_circuit.unitary(unitaries[index + 1], quantum_circuit.qubits[0:4], f"$U_{{{index + 1}}}$")
     
     quantum_circuit.measure([0], [0])
 
-    if self.draw_circuit or draw:
-      quantum_circuit.draw(output=output_format, filename=filename)
-    
-    try:
-      if backend == "aer_simulator":
-        circuit_backend = Aer.get_backend(backend, device='GPU')
-        if 'GPU' in circuit_backend.available_devices() and self.enable_gpu:
-          if self.show_gpu_support:
-            print(f"The backend {backend} supports GPU. We are using it!")
-          self.show_gpu_support = False
-          counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
-          return counts
-        else:
-          circuit_backend = Aer.get_backend(backend)
-          counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
-          return counts
-      else:
-        circuit_backend = Aer.get_backend(backend)
-        counts = qiskit.execute(quantum_circuit, circuit_backend, shots=shots).result().get_counts()
-        return counts
-    except AerError as e:
-      print(f"This module generated the following error [{e}]")
-    return None
+    return quantum_circuit

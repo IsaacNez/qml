@@ -8,6 +8,7 @@ from network.quantum import QuantumOperator
 import utils.utils as tl
 from joblib import Parallel, delayed
 from itertools import cycle
+import gc
 
 devices = tf.config.list_physical_devices()
 for device in devices:
@@ -56,15 +57,15 @@ class Network():
     self.draw_circuit       = draw_circuits
     self.epochs             = epochs
     self.batch              = batch
-    self.weights            = tf.random.normal((self.circuit_dim - 1, self.unitary_dim ** 2)) if not efficient else tf.random.normal((self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2))
+    self.weights            = tf.random.uniform((self.circuit_dim - 1, self.unitary_dim ** 2)) if not efficient else tf.random.uniform((self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2))
     self.classes            = classes
     self.efficient          = efficient
     self.shuffle            = shuffle
 
     print("Welcome to TN on Qiskit!!!")
     if self.enable_log:
-      print(f"\u2192This code will be run on an image size of {self.image_size}x{self.image_size} on Qiskit with {self.shots} shots")
-      print(f"\u2192We will train for {self.epochs} epochs with a batch size of {self.batch} on", "a shuffled" if self.shuffle else "an unshuffled", "dataset")
+      print(f"\u2192 This code will be run on an image size of {self.image_size}x{self.image_size} on Qiskit with {self.shots} shots")
+      print(f"\u2192 We will train for {self.epochs} epochs with a batch size of {self.batch} on", "a shuffled" if self.shuffle else "an unshuffled", "dataset")
     print("")
     self.dataset = Dataset( image_size=self.image_size,
                             enable_transformations=self.enable_transform,
@@ -81,6 +82,7 @@ class Network():
   def execute(self, image, label, weights, efficient, classes, device):
     result = self.qcircuit.execute(image, weights=weights, efficient=efficient, device=device, shots=self.shots)
     loss, correct = self.loss(result, label, classes)
+    gc.collect()
     return loss, correct
 
   def spsa_loss(self, batch, weights, classes, verbose: bool = False, name: str = "SPSA Loss"):
@@ -91,7 +93,7 @@ class Network():
     
     if len(devices) > 1:
       jobs += len(devices) - 1
-    results = Parallel(n_jobs=int(jobs))(delayed(self.execute)(image, label, weights, self.efficient, classes, device) for image, label, device in zip(idx_data, idx_label, cycle(devices)))
+    results = Parallel(n_jobs=int(jobs), backend='loky')(delayed(self.execute)(image, label, weights, self.efficient, classes, device) for image, label, device in zip(idx_data, idx_label, cycle(devices)))
 
     for values in results:
       total_loss += values[0]
@@ -100,6 +102,8 @@ class Network():
     if verbose:
       print(f"The {name} is {total_loss / batch[0].shape[0]} with accuracy {total_correct / batch[0].shape[0]} ")
 
+    del results
+    gc.collect()
     return (total_loss / batch[0].shape[0]), total_correct
 
   def predict(self):
@@ -139,7 +143,7 @@ class Network():
     self.correct_l1 = []
     self.correct_l2 = []
 
-    for epoch in range(self.epochs):
+    for epoch in range(self.epochs + 1):
       alpha_k = self.param_a / (epoch + self.param_A + 1) ** self.param_s
       beta_k  = self.param_b / (epoch + 1) ** self.param_t
 
@@ -151,12 +155,12 @@ class Network():
       num_batch = 0
       for batch in self.dataset.get_batch(batch=self.batch):
         print(f"Batch: {num_batch}")
-        b = self.param_b
-        mean = tf.math.reduce_mean(batch[0]) / (2*b)
-        a = self.param_a/mean
-        alpha_k = a / (epoch + mean + 1) ** self.param_s
-        beta_k  = b / (epoch + 1) ** self.param_t
-        delta = tfp.distributions.Bernoulli(probs=0.5, dtype=tf.float32).sample(sample_shape=(self.circuit_dim - 1, self.unitary_dim ** 2) if not self.efficient else (self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2))
+        # b = self.param_b
+        # mean = tf.math.reduce_mean(batch[0]) / (2*b)
+        # a = self.param_a/mean
+        # alpha_k = a / (epoch + mean + 1) ** self.param_s
+        # beta_k  = b / (epoch + 1) ** self.param_t
+        delta = tfp.distributions.Binomial(total_count=batch[0].shape[0], probs=0.5, allow_nan_stats=False).sample(sample_shape=(self.circuit_dim - 1, self.unitary_dim ** 2) if not self.efficient else (self.circuit_dim - 3, (self.unitary_dim ** 2) ** 2))
         # delta = tf.random.normal((self.circuit_dim - 1, self.unitary_dim ** 2))
         weights_neg, weights_pos = self.weights - beta_k * delta, self.weights + beta_k * delta
 
@@ -170,23 +174,24 @@ class Network():
         self.loss_l2.append(l_tilde_2)
         self.correct_l1.append(correct / batch[0].shape[0])
         self.correct_l2.append(correct_2 / batch[0].shape[0])
-        # if self.enable_log:
-        #   print(f"The loss g is {self.loss_g}, compared to +alpha {self.loss_l1} and -alpha {self.loss_l2} with acc {correct / batch[0].shape[0]} and {correct_2 / batch[0].shape[0]} respectively")
-        spsa_v = self.param_gamma * spsa_v - g * alpha_k * delta
+        
+        # spsa_v = self.param_gamma * spsa_v - g * alpha_k * delta
 
-        self.weights = self.weights + spsa_v
+        # self.weights = self.weights + spsa_v
+        self.weights -= g * alpha_k * tf.math.reciprocal_no_nan(delta)
 
         
         if output_results:
           tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"loss_{self.image_size}x{self.image_size}.png", marker='.')
           tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label="SPSA Loss +alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
           tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label="SPSA Loss -alpha", title="Total Loss", save_plot=True, filename=f"total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
-          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L +alpha", save_plot=True, filename=f"accuracy_L1_{self.image_size}x{self.image_size}.png", marker='.')
-          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L -alpha", save_plot=True, filename=f"accuracy_L2_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L +alpha", save_plot=True, filename=f"accuracy_L1_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
+          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy", title="Accuracy for L -alpha", save_plot=True, filename=f"accuracy_L2_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
 
         epoch_correct += int((correct + correct_2)/2)
         num_batch += 1
-
+        del batch
+        gc.collect()
         
       
       if self.enable_log:
@@ -195,7 +200,7 @@ class Network():
       self.accuracy.append(epoch_correct / self.dataset.get_dataset_size())
       
       if output_results:
-        tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, filename=f"accuracy_{self.image_size}x{self.image_size}.png", marker='o')
+        tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, ylim=[0,1], filename=f"accuracy_{self.image_size}x{self.image_size}.png", marker='o')
 
 
 if __name__ == '__main__':
@@ -205,14 +210,9 @@ if __name__ == '__main__':
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
                   draw_circuits=False, epochs=30, 
-                  efficient=False, batch=222, 
-                  shuffle=False, samples=-1, 
-                  shots=1024,
-                  param_A=0,
-                  param_a=0.628,
-                  param_s=0.602,
-                  param_t=0.101,
-                  param_b=0.2)
+                  efficient=True, batch=22, 
+                  shuffle=True, samples=1266, 
+                  shots=1025)
   model.train(output_results=True)
   model.predict()
 
