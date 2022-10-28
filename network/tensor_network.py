@@ -209,7 +209,7 @@ class Network():
         l_tilde_2, correct_2 = self.spsa_loss(batch, weights_neg, self.classes, True, "L2 Loss")
         
         if self.perf_metrics:
-          print(f"Total batch time is: {time.time() - start_batch}")  
+          print(f"Total batch time is: {time.time() - start_batch} seconds")  
 
         g = (l_tilde_1 - l_tilde_2) / (2*alpha_k)
         
