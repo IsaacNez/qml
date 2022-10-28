@@ -1,9 +1,20 @@
+from genericpath import isdir
 import numpy as np
 from typing import *
 import tensorflow as tf
+import matplotlib
 import matplotlib.pyplot as plt
 import sys
 import os
+
+# Enable the Agg backend to avoid 
+# figure artifacts being left behind
+# after saving an image in non-interactive mode
+# This will reduce memory consumption by main process
+# and subsequentely, it will avoid crashing due to running
+# out of RAM.
+# Source: https://stackoverflow.com/questions/31156578/matplotlib-doesnt-release-memory-after-savefig-and-close
+matplotlib.use('Agg')
 
 def generate_random_int(len: int, start: int = 0) -> int:
   return np.random.randint(len - start) + start
@@ -19,17 +30,18 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
                   x_label: str = None,
                   y_label: str = None,
                   title: str = None,
-                  fontsize: int = 18,
+                  fontsize: int = 36,
                   save_plot: bool = False,
                   filename: str = None,
                   xlim: list = None,
                   ylim: list = None,
+                  path: str = 'output',
                   **kwargs) -> None:
 
   if x_value is None and y_value is None:
     sys.exit("Please provide at least the y_value")
   
-  plt.figure(figsize=[19.2, 14.4])
+  plt.figure(figsize=[20, 15])
   if x_value is not None:
     plt.plot(x_value, y_value, **kwargs)
   else:
@@ -49,10 +61,16 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
 
   if not save_plot and filename is None:
     plt.show(block=False)
-    plt.close()
+    plt.cla()
+    plt.clf()
+    plt.close('all')
   else:
-    output_path = os.path.abspath("output/")
+    if not os.path.exists(path):
+      os.makedirs(path)
+    output_path = os.path.abspath(path)
     plt.savefig(os.path.join(output_path, filename), format="png")
-    plt.close()
+    plt.cla()
+    plt.clf()
+    plt.close('all')
 
   
