@@ -17,8 +17,8 @@ class Dataset():
               batch: int = 222, 
               enable_log: bool = False,
               filter: bool = False,
-              samples: int = 100,
               filter_by: dict = None,
+              samples: int = 100,
               shuffle: bool = False) -> 'Dataset':
     """ Download the MNIST Dataset to be used for
         training, test, and validation.
@@ -35,18 +35,40 @@ class Dataset():
       batch:                    Defines the batch size. Default is 222
 
       enable_log:               Enables verbose loggin for this class
+
+      filter:                   Filter the dataset to only have the classes provided
+                                by filter_by parameter. 
+      
+      filter_by:                Dictionary with the classes to filter by.
+                                The dictionary should have the format:
+                                {<digit>:"<class>", <digit>:"<class>"}
+                                Digit is an integer from 0 to 9 and class should be
+                                0 or 1.
+                              
+      samples:                  Specify how many samples you want to use to train and
+                                test. From samples, 0.8*samples will be used to train 
+                                and 0.2*samples will be used test from their respective
+                                dataset. When samples is -1, it will use the complete train
+                                and test dataset.
+
+      shuffle:                  Indicate if you wish to shuffle the dataset before calling
+                                get_batch. This to ensure each epoch obtains randomly sorted
+                                images.
     """
     
     if not isinstance(image_size, int):
-      sys.exit("Please provide an integer for the image size")
+      raise TypeError("Please provide an integer for the image size")
     elif image_size % 2 != 0:
-      sys.exit("Please provide an even integer for the image size")
-    elif image_size > 28:
-      sys.exit("Please use an image size lower or equal than 28")
+      raise ValueError("Please provide an even integer for the image size")
+    elif image_size > 28 or image_size < 4:
+      raise ValueError("Please an image size between 4 and 28")
 
     if filter and filter_by is None:
-      sys.exit("If you want to filter the dataset, you need to specify the classes to filter by")
+      raise ValueError("If you want to filter the dataset, you need to specify the classes to filter by")
+    elif filter and len(filter_by.keys()) > 2:
+      raise ValueError("This dataset only supports two classes.")
 
+    
     self.image_size = image_size
     self.batch = batch
     self.shuffle = shuffle
@@ -92,13 +114,13 @@ class Dataset():
       print(f"The resulting training dataset has {self.image_train.shape[0]} images and the test one has {self.image_test.shape[0]} images")
 
 
-  def transforms(self, image_train: np.ndarray, image_test: np.ndarray) -> Any:
+  def transforms(self, image_train: tf.Tensor, image_test: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor, tf.Tensor]:
     """ Applies random crop and 90 degrees rotation to a subset of the MNIST Dataset
 
     Args:
-      image_train:  A numpy ndarray for the train dataset
+      image_train:  A 3D Tensor array for the train dataset
 
-      image_test:   A numpy ndarray for the test dataset
+      image_test:   A 3D Tensor for the test dataset
     
     Output:
       cropped:        A numpy ndarray with the cropped images of size mxm. 
@@ -134,7 +156,17 @@ class Dataset():
 
     return cropped, rotated, cropped_test, rotated_test
 
-  def get_batch(self, batch: int = 222) -> Any:
+  def get_batch(self, batch: int = 222) -> Iterable[Tuple[tf.Tensor, np.ndarray]]:
+    """ Returns an interable batch of images for training
+    
+    Args:
+      batch:                        Indicates the size of the batch
+
+    Output:
+      Iterable[Tensor, NDArray]:    An iterable batch for images and the corresponding
+                                    labels. The size of Tensor is (batch, image_size, image_size)
+                                    The size of NDArray is (batch,)   
+    """
     self.shuffle_train_dataset()
 
     for idx in range(0, self.image_train.shape[0], batch):
@@ -142,22 +174,45 @@ class Dataset():
       idxs = slice(idx, lim)
       yield tf.convert_to_tensor(self.image_train[idxs]), self.label_train[idxs]
 
-  def shuffle_train_dataset(self):
+  def shuffle_train_dataset(self) -> None:
+    """ Shuffle train dataset and labels accordingly.
+    """
     if self.shuffle:
       self.indices = tf.random.shuffle(self.indices)
 
       self.image_train = tf.gather(self.image_train, self.indices).numpy() 
       self.label_train = tf.gather(self.label_train, self.indices).numpy()
 
-  def get_image(self):
-    return self.image_train[0]
+  def get_image(self, index: int = 0) -> tf.Tensor:
+    """ Returns an specific image from the training dataset.
 
-  def get_dataset_size(self):
+    Args:
+      index:        Index of image to obtain from the training dataset.
+    
+    Output:
+      tf.Tensor     Tensor representing the image at position index 
+                    from the training dataset. The size of the Tensor
+                    is (1, image_size, image_size)
+    """
+    if index > self.image_train.shape[0]:
+      raise ValueError("Index out of range for the training dataset")
+    return self.image_train[index]
+
+  def get_dataset_size(self) -> int:
+    """ Obtain the training dataset from the Tensor storing it. """
     return self.image_train.shape[0]
 
-  def get_test_samples(self):
+  def get_test_samples(self) -> Iterable[Tuple[tf.Tensor, str]]:
+    """ Iterator for the testing images.
+
+    Ouput:
+      Iterable[tf.Tensor, str]:   Yields the image and the corresponding 
+                                  label. The size of the Tensor is 
+                                  (1, image_size, image_size)
+    """
     for image, label in zip(self.image_test, self.label_test):
       yield image, label
   
-  def get_test_dataset_size(self):
+  def get_test_dataset_size(self) -> int:
+    """ Returns the test dataset size """
     return self.image_test.shape[0]

@@ -1,4 +1,3 @@
-from genericpath import isdir
 import numpy as np
 from typing import *
 import tensorflow as tf
@@ -17,10 +16,30 @@ import os
 matplotlib.use('Agg')
 
 def generate_random_int(len: int, start: int = 0) -> int:
+  """ Generates a random integer
+
+  Args:
+    len:      Upper limit for the random generator
+    start:    Lower limit for the random generator
+  
+  Output:
+    int:      Generates a random integer between start and len.
+  """
   return np.random.randint(len - start) + start
 
 
 def generate_random_range(len: int) -> Tuple[int, int]:
+  """ Generates a random range 
+
+      Creates the start and end limits of a range
+      by using a random generator.
+
+  Args:
+    len:                Represents the amount of integers for the range
+
+  Output:
+    Tuple[int, int]:    A range with random limits of length len
+  """
   start = generate_random_int(len)
   end = generate_random_int(len, start)
   return start, end
@@ -36,10 +55,44 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
                   xlim: list = None,
                   ylim: list = None,
                   path: str = 'output',
+                  show_max: bool = False,
                   **kwargs) -> None:
 
+  """ Plotting interface for the Network class.
+
+  Args:
+    x_value:        Values for the x-axis. x_value and y_value should have the same length.
+    
+    y_value:        Values for the y-axis. x_value and y_value should have the same length.
+                    If x_value is not given, it will be assumed from the length of y_value.
+
+    x_label:        The label for the x-axis.
+
+    y_label:        The label for the y-axis.
+
+    title:          A title for the figure.
+
+    fontsize:       The fontsize for the elements in the figure.
+
+    save_plot:      Indicates if the figure should be interactively displayed or saved to file.
+
+    filename:       Filename for the figure when it must be saved to file.
+
+    xlim:           Range limit for the x-axis.
+
+    ylim:           Range limit for the y-axis.
+
+    path:           Path where the figure should be saved.
+
+    show_max:       If the plot should show a line representing where the max value is.
+
+    kwargs:         Another arguments passed down to the Figure class.
+
+  Raises:
+    ValueError:     If x_value and y_value are not provided, it will raised a ValueError exception.
+  """
   if x_value is None and y_value is None:
-    sys.exit("Please provide at least the y_value")
+    raise ValueError("Please provide at least the y_value")
   
   plt.figure(figsize=[20, 15])
   if x_value is not None:
@@ -58,6 +111,20 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
 
   if ylim is not None:
     plt.ylim(ylim)
+
+  num_points = len(y_value)
+  if show_max and num_points > 4:
+    max = max(y_value)
+    half_x = num_points // 2
+    plt.axhline(y=max, colors="red", linestyle="--")
+    plt.annotate(f"{max}",
+      xy=(half_x, max),
+      xytext=(int(half_x+0.5*half_x), int(max + 0.5*max)),
+      color="red",
+      fontsize=fontsize,
+      arrowprops=dict(facecolor="red")
+    )
+
 
   if not save_plot and filename is None:
     plt.show(block=False)

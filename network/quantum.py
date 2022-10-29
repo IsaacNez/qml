@@ -39,6 +39,18 @@ class QuantumOperator():
                           The weight vector dimensions are calculated with
                           this parameter. The dimensions are defined by: 
                           circuit_dimension - 1 x unitary_dimension^2
+
+      debug_log:          Enables debug logs for this class
+
+      draw_circuit:       Enables drawing the circuit after it is built.
+                          This function is not thread safe.
+
+      show_gpu_support:   It enables debug logs to indicate if the backend
+                          simulator supports Hardware Acceleration.
+
+      enable_gpu:         It checks if the choosen backend supports GPU.
+                          If GPU is enabled but the backend does not support 
+                          it, it will run on the CPU. 
     """
 
     self.circuit_dimension = circuit_dimension
@@ -49,7 +61,16 @@ class QuantumOperator():
     self.enable_gpu = enable_gpu
   
   def feature_map(self, image: tf.Tensor) -> tf.Tensor:
+    """ Maps a normalized input image to the feature map
+        given by x -> |Φ> = [cos(x_1*pi/2) sin(x_1*pi/2) ] ⊗ ... ⊗  [cos(x_n*pi/2) sin(x_n*pi/2) ]
+        where n is the number of pixels.
 
+    Args:
+      image:        Normalized image of size (N, N)
+  
+    Output:
+      ft_map:       Feature map of size (N, 2)
+    """
     ft_map = np.zeros((image.shape[0], 2))
     for index, value in enumerate(image):
       ft_map[index][0] = np.cos(np.pi / 2 * value)
@@ -58,7 +79,26 @@ class QuantumOperator():
     return ft_map
   
   def hermitian_matrix(self, weights: tf.Tensor, unitary_dimension: int = 4) -> tf.Tensor:
+    """ Generate a hermitian matrix using the weighs. 
 
+        It generates a hermitian matrix from the weights where the diagonal are the first
+        uniary_dimension elements. The strictly upper triangular indices are built by composing
+        complex numbers from the remaining weights.
+
+    Args:
+      weights:              A tensor of size (unitary_dimension^2,) or ((unitary_dimension^2)^2,) 
+                            for the normal/experimental and efficient circuit, respectively.          
+      
+      unitary_dimension:    Size of the diagonal of the resulting hermitian matrix. For a two-qubit unitary
+                            gate, the matrix is (4, 4) = 4 diagonal elements. For a four-qubit unitary gate, 
+                            the matrix is (16, 16) = 16 diagonal elements.
+
+    Output:
+      Tensor:               Resulting hermitian matrix of size (unitary_dimension, unitary_dimension)
+
+    Raise:
+      is_hermitian_matrix:  If the resulting matrix from the weights is not hermitian, it will raise an assert error.
+    """
     diag = weights[:unitary_dimension]
     complex_range = (weights.shape[0] - unitary_dimension) // 2 + unitary_dimension
     reals = weights[unitary_dimension:complex_range]
@@ -77,7 +117,28 @@ class QuantumOperator():
     return tf.convert_to_tensor(hermitian, dtype=tf.complex128)
 
   def unitary_matrices(self, weights: tf.Tensor = None, unitary_dimension: int = 4) -> tf.Tensor:
+    """ Generate unitary matrices from hermitian matrices 
 
+        From the array of weights, generate a per-weight hermitian matrix to then
+        generate a unitary matrix by exp(1j*H).
+
+    Args:
+      weights:              A tensor of size A tensor of size (circuit_dimension -1, unitary_dimension^2) or 
+                            (circuit_dimension -3, (unitary_dimension^2)^2) for the normal/experimental
+                            and efficient circuit, respectively.  
+      
+      unitary_dimension:    The size of the resulting unitary matrix.  For a two-qubit unitary
+                            gate, the matrix is (4, 4) = 4 diagonal elements. For a four-qubit unitary gate, 
+                            the matrix is (16, 16) = 16 diagonal elements.
+    
+    Output:
+      Tensor:               An unitary tensor of size (circuit_dimension -1, unitary_dimension, unitary_dimension) or 
+                            (circuit_dimension -3, unitary_dimension^2, unitary_dimension^2) for the normal/experimental
+                            and efficient circuit, respectively.
+    
+    Raise:
+      is_unitary_matrix:    Raises an assert error if the resulting matrices are not unitary.
+    """
     if weights == None:
       weights = self.weights
 
@@ -103,17 +164,70 @@ class QuantumOperator():
                     filename: str = "qiskit_circuit", 
                     shots: int = 512,
                     weights: tf.Tensor = None,
-                    efficient: bool = False,
                     circuit_type: str = 'normal',
-                    device: str = "/physical_device:CPU:0") -> (Any or np.ndarray):
+                    device: str = "/physical_device:CPU:0") -> (dict):
 
+    """ Creates the Quantum Circuit for binary classification based on 
+        the given image and weights.
+
+    Args:
+      image:            The image to classify. The size must be (circuit_size,)
+      
+      backend:          Backend simulator to execute the quantum circuit.
+
+      draw:             Indicate if the circuit should be drawn before 
+                        executing the experiment. There is no option to 
+                        draw this circuit interactively but rather it is
+                        written to a file.
+
+      output_format:    Format to draw the circuit. For me, look at the backend plotters
+                        supported by Qiskit.
+
+      filename:         Filename of the resulting drawing.
+
+      shots:            The number of times to repeat the experiment.
+
+      weights:          Model space parameters to influence the binary classification.
+
+      circuit_type:     Type of circuit to build. Currently, we support three types of 
+                        circuits:
+
+                          1.  Normal (normal): this circuit uses (circuit_size - 1) two-qubit unitary gates
+                              spread across log2(circuit_size) layers. This circuit expects
+                              (circuit_size - 1)*(unitary_size^2) parameters. This circuit uses 
+                              circuit_size qubits.
+
+                          2.  Efficient (efficient): this circuit uses (circuit_size - 3) four-qubit unitary gates
+                              spread across (circuit_size - 3) layers. This circuit uses only 4 qubits
+                              and one classical register but it uses (circuit_size - 1)*(unitary_size^2)^2
+                              parameters
+
+                          3.  Experimental (experimental): this circuit is my own implementation. It uses 
+                              (circuit_size -1) two-qubit unitary gates spread over
+                              (circuit_size - 4)/2 layers but it uses only 4 qubits and one classical
+                              register. This circuit uses (circuit_size - 1)*(unitary_size^2)
+      
+      device:           It specifies the device to place the data. For GPU-enable systems, it offers Hardware 
+                        Acceleration for Tensorflow operations. By default, it uses the CPU.
+
+    Output:
+      counts:           It returns the result from the binary classification with the counts per class in the form
+                        {"0": x, "1": y}, where x + y = shots. If there is an error, it will return None.
+          
+    """
     if image is None:
-      sys.exit("This function did not receive an image")
+      raise ValueError("The image cannot be None. Please pass an image.")
     
+    if len(filename) <= 0:
+      raise ValueError("Please indicate a name for the filename")
+
     tf.device(device)
 
     if weights is None:
-      self.weights = tf.random.normal((self.circuit_dimension - 3, (self.unitary_dimension * 2) ** 2) if efficient else (self.circuit_dimension - 1, self.unitary_dimension ** 2))
+      if circuit_type == 'normal' or circuit_type == 'experimental':
+        self.weights = tf.random.normal((self.circuit_dimension - 1, self.unitary_dimension ** 2))
+      else:
+        self.weights = tf.random.normal((self.circuit_dimension - 3, (self.unitary_dimension * 2) ** 2))
     else:
       self.weights = weights
 
@@ -167,7 +281,18 @@ class QuantumOperator():
       return None
 
 
-  def gen_normal_circuit(self, features, unitaries):
+  def gen_normal_circuit(self, features: tf.Tensor, unitaries: tf.Tensor) -> qiskit.QuantumCircuit:
+    """ Generates the 'normal' Quantum Circuit 
+
+    Args:
+      features:         Tensor representing the feature map for the image to classify.
+
+      unitaries:        Tensor containing the description of the unitary gates for the circuit.
+
+    Output:
+      QuantumCircuit:   Quantum Circuit of size with circuit_dimension qubits and circuit_dimension -1 
+                        unitary gates over log2(circuit_dimension) layers.
+    """
     quantum_circuit = qiskit.QuantumCircuit(self.circuit_dimension, 1)
 
     for index, feature in enumerate(features):
@@ -186,6 +311,17 @@ class QuantumOperator():
     return quantum_circuit
 
   def gen_efficient_circuit(self, features, unitaries):
+    """ Generates the efficient Quantum Circuit 
+
+    Args:
+      features:         Tensor representing the feature map for the image to classify.
+
+      unitaries:        Tensor containing the description of the unitary gates for the circuit.
+
+    Output:
+      QuantumCircuit:   Quantum Circuit of size with 4 qubits and circuit_dimension - 3 
+                        unitary gates over circuit_dimension - 3 layers.
+    """
     quantum_circuit = qiskit.QuantumCircuit(4, 1)
 
     for index in range(4):
@@ -203,6 +339,17 @@ class QuantumOperator():
     return quantum_circuit
   
   def gen_experimental_circuit(self, features, unitaries):
+    """ Generates the experimental Quantum Circuit 
+
+    Args:
+      features:         Tensor representing the feature map for the image to classify.
+
+      unitaries:        Tensor containing the description of the unitary gates for the circuit.
+
+    Output:
+      QuantumCircuit:   Quantum Circuit of size with 4 qubits and circuit_dimension - 1 
+                        unitary gates over (circuit_dimension - 4)/2 layers.
+    """
     quantum_circuit = qiskit.QuantumCircuit(4,1)
 
     for index in range(4):
@@ -221,11 +368,11 @@ class QuantumOperator():
       quantum_circuit.reset(reset_indexes[idx%2][1])
       quantum_circuit.initialize(features[2*index + 4], reset_indexes[idx%2][0])
       quantum_circuit.initialize(features[2*index + 5], reset_indexes[idx%2][0])
-      quantum_circuit.unitary(unitaries[2*index + 2], quantum_circuit.qubits[0:2], f'$U_{{{index + 2}}}$')
-      quantum_circuit.unitary(unitaries[2*index + 3], quantum_circuit.qubits[2:4], f'$U_{{{index + 3}}}$')
+      quantum_circuit.unitary(unitaries[2*index + 2], quantum_circuit.qubits[0:2], f'$U_{{{2*index + 2}}}$')
+      quantum_circuit.unitary(unitaries[2*index + 3], quantum_circuit.qubits[2:4], f'$U_{{{2*index + 3}}}$')
       # idx += 1
     
-    quantum_circuit.unitary(unitaries[-1], [quantum_circuit.qubits[1],quantum_circuit.qubits[3]], f'$U_{{{index + 4}}}$')
+    quantum_circuit.unitary(unitaries[-1], [quantum_circuit.qubits[1],quantum_circuit.qubits[3]], f'$U_{{{2*index + 4}}}$')
 
     quantum_circuit.measure([3], [0])
 

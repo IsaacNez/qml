@@ -1,7 +1,10 @@
+""" Class definition for the Tensor Network """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
 import operator
+from typing import *
+import numpy as np
 import tensorflow as tf
 import tensorflow_probability as tfp
 from utils.dataloader import Dataset
@@ -11,17 +14,13 @@ from joblib import Parallel, delayed
 from itertools import cycle
 import gc
 import pickle
-<<<<<<< HEAD
-=======
 import time
->>>>>>> 13c06391614116986588f582c74a66abbc2b1c6a
 
 devices = tf.config.list_physical_devices()
 for device in devices:
   if device.device_type == 'GPU':
     tf.config.experimental.set_memory_growth(device, True)
 
-# tf.config.set_visible_devices([], 'GPU')
 
 class Network():
   def __init__(self,  image_size: int = 4,
@@ -46,8 +45,61 @@ class Network():
                       circuit_type: str = 'normal',
                       shuffle: bool = False,
                       perf_metrics: bool = False,
-                      samples: int = -1):
-  
+                      samples: int = -1) -> 'Network':
+    """ Creates the Network and defines the required parameters 
+
+    Args:
+      image_size:                     It specifies the size of the image. The resulting image will be
+                                      of size (image_size, image_size)
+
+      circuit_dim:                    It specifies the number of qubits to use. A good way to define is
+                                      image_size*image_size
+
+      unitary_dim:                    It specifies the dimension of the unitary matrices. By default 
+                                      (two-qubit), it is of size (unitary_dim, unitary_dim).
+
+      shots:                          It determines how many times the experiment is run.
+
+      param_a:                        It defines the value of a used to generate the series alpha_k
+
+      param_b:                        It defines the value of b used to generate the series beta_k
+
+      param_A:                        It defines the value of A used to generate the series alpha_k
+
+      param_s:                        It defines the value of s used to generate the series alpha_k
+
+      param_t:                        It defines the value of t used to generate the series beta_k
+
+      param_lambda:                   It defines the value of lambda used to calculate the Loss
+
+      param_eta:                      It defines the value of eta used to calculate the Loss
+
+      param_gamma:                    It defines the value of gamma used for the momentum update [DEPRECRATED]
+
+      enable_transformations:         It enables Data Augmentation for the train dataset
+
+      enable_log:                     It enables debug outputs for this class and subclasses.
+
+      draw_circuits:                  It indicates to the QuantumOperator if the circuit should be drawn.
+
+      epochs:                         It defines for how many epochs the training process should run.
+
+      batch:                          It defines the size of batch.
+
+      classes:                        It defines the classes for binary classification. It should be of the form
+                                      {digit: "<class>", digit: "<class>"}, where digit is an integer from 0-9 and
+                                      <class> is 0 or 1.
+
+      circuit_type:                   It defines the method to run the QuantumOperator. For more, read the documentation
+                                      of QuantumOperator.execute
+
+      shuffle:                        It activates the shuffling behavior for the Dataset class.
+
+      perf_metrics:                   It output performance metrics in each batch.
+
+      samples:                        It defines how many samples the Dataset class should generate. For more on this 
+                                      parameter, read the documentation for the Dataset class.
+    """
     self.image_size         = image_size
     self.circuit_dim        = circuit_dim
     self.unitary_dim        = unitary_dim
@@ -95,25 +147,88 @@ class Network():
       print(f"\u2192 This code will be run on an image size of {self.image_size}x{self.image_size} on Qiskit with {self.shots} shots for the {self.circuit_type} circuit")
       print(f"\u2192 We will train for {self.epochs} epochs with a batch size of {self.batch} on", "a shuffled" if self.shuffle else "an unshuffled", "dataset")
     print("")
+
     self.dataset = Dataset( image_size=self.image_size,
                             enable_transformations=self.enable_transform,
                             enable_log=self.enable_log, filter=True, filter_by=self.classes, samples=samples, shuffle=self.shuffle)
 
     self.qcircuit = QuantumOperator(circuit_dimension=self.circuit_dim, draw_circuit=draw_circuits, show_gpu_support=False, enable_gpu=False)
   
-  def loss(self, prediction, label, classes):
+
+  def loss(self, prediction: dict, label: str, classes: dict) -> Tuple[float, int]:
+    """ Loss Function per image 
+    
+    Args:
+      prediction:         Dictionary with the predicted results.
+
+      label:              Correct label
+
+      classes:            Mapping of labels to classes
+
+    Output
+      Tuple[float, int]:  Tuple representing the loss and if it was a correct prediction (1) or not (0)
+    """
     p_result = max(prediction.values()) / self.shots
     p_label = prediction.pop(classes[label], None) / self.shots
     p_max_false = max(prediction.values()) / self.shots
     return max(p_max_false - p_label + self.param_lambda, 0) ** self.param_eta, 1 if p_result == p_label else 0
 
-  def execute(self, image, label, weights, efficient, circuit_type, classes, device):
-    result = self.qcircuit.execute(image, weights=weights, efficient=efficient, device=device, shots=self.shots, circuit_type=circuit_type)
+  def execute(self, image: tf.Tensor, label: str, weights: tf.Tensor, circuit_type: str, classes: dict, device: Any or str) -> Tuple[float, int]:
+    """ Executes and calculates the loss of the current execution results 
+    
+    Args:
+      image:                Image to classify of the size (image_size, image_size)
+
+      label:                Label of the corresponding image
+
+      weights:              Corresponding weights of the classification model. The size should be 
+                            (circuit_size-1, unitary_dimension^2) or (circuit_size-3, (unitary_dimension^2)^2)
+                            depending on the circuit_type. 
+
+      circuit_type:         Circuit type to run the classification task. Read the documentation from QuantumOperator.execute
+                            for more information.
+
+      classes:              Dictionary with mapping of digits to classes.
+
+      device:               Device to run the Network and QuantumOperator. This value will be ignored if the system does not
+                            support Hardware Acceleration
+
+    Output:
+      Tuple[float, int]:    Tuple representing the loss and if it was a correct prediction (1) or not (0)
+    """
+    result = self.qcircuit.execute(image, weights=weights, device=device, shots=self.shots, circuit_type=circuit_type)
     loss, correct = self.loss(result, label, classes)
     gc.collect()
     return loss, correct
 
-  def spsa_loss(self, batch, weights, classes, verbose: bool = False, name: str = "SPSA Loss"):
+  def spsa_loss(self, batch: Tuple[tf.Tensor, np.ndarray], weights: tf.Tensor, classes: dict, verbose: bool = False, name: str = "SPSA Loss") -> Tuple[float, int]:
+    """ Calculates the SPSA Loss for a specific batch 
+
+        This method uses hybrid parallelism to speedup the computation of the loss 
+        per batch. If the system supports Hardware Acceleration, it will spawn threads
+        (when possible) on it. By default it uses the totality of your logical cores, thus
+        be careful with the size of your batch.
+
+        Likewise, for optimal performance, try to avoid other high-intensity programs while 
+        this function is running.
+
+    Args:
+      batch:                Batch of images with their corresponding label to classify. The size should be
+                            (batch, image_size, image_size)
+
+      weights:              Corresponding weights of the classification model. The size should be 
+                            (circuit_size-1, unitary_dimension^2) or (circuit_size-3, (unitary_dimension^2)^2)
+                            depending on the circuit_type.
+
+      classes:              Dictionary with mapping of digits to classes.
+
+      verbose:              If the method should output verbose logging.
+
+      name:                 Name identifies if this function is called multiple times
+
+    Output:
+      Tuple[float, int]:    Loss and count of correct predictions.
+    """
     idx_data, idx_label = batch
     total_loss, total_correct = 0.0, 0
     
@@ -121,7 +236,7 @@ class Network():
     
     if len(devices) > 1:
       jobs += len(devices) - 1
-    results = Parallel(n_jobs=int(jobs), backend='loky')(delayed(self.execute)(image, label, weights, self.efficient, self.circuit_type, classes, device) for image, label, device in zip(idx_data, idx_label, cycle(devices)))
+    results = Parallel(n_jobs=int(jobs), backend='loky')(delayed(self.execute)(image, label, weights, self.circuit_type, classes, device) for image, label, device in zip(idx_data, idx_label, cycle(devices)))
 
     for values in results:
       total_loss += values[0]
@@ -138,8 +253,19 @@ class Network():
 
     return (total_loss / batch_size), total_correct
 
-  def predict(self):
+  def predict(self) -> None:
+    """ Calculate the prediction accuracy for the Network
 
+      Based on the test dataset and the fitted Network parameters (weights),
+      calculate the Network accuracy to predict the correct class for the images 
+      in the test dataset.
+
+      This method use hybrid parallelism where it will use Hardware Acceleration when 
+      possible.
+
+      Be careful to run other heavy-load applications alongside this method to not decrease
+      its performance.
+    """
     if self.enable_log:
       print("Starting testing...")
     jobs = os.cpu_count()
@@ -163,7 +289,18 @@ class Network():
         print(" \u2716")
     print(f"The accuracy of the model is {prediction_correct}/{self.dataset.get_test_dataset_size()}={prediction_correct/self.dataset.get_test_dataset_size()}")
 
-  def save_model(self, path: str = 'model/',filename: str = 'tn_model.pickle'):
+  def save_model(self, path: str = 'model/',filename: str = 'tn_model.pickle') -> None:
+    """ Saves the current Network to be further used 
+    
+    Args:
+      path:         Path where the model will be saved. Before saving,
+                    it will be converted into an absolute path and check
+                    if it exists. When it does not exist, it will be created.
+
+      filename:     Filename for the model. It must have the .pickle extension.
+                    The filename gets appended to the absolute path before opening
+                    the file descriptor.
+    """
     if not os.path.exists(path):
       os.makedirs(path)
     
@@ -173,7 +310,23 @@ class Network():
       pickle.dump(self, file)
 
   @staticmethod
-  def load_model(path: str = 'model/', filename: str = 'tn_model.pickle'):
+  def load_model(path: str = 'model/', filename: str = 'tn_model.pickle') -> 'Network':
+    """ Load a model of type Network for further processing 
+    
+    Args:
+      path:         Path where the model is located. Before opening, the existance
+                    of the file is checked.
+
+      filename:     Filename for the model. It must have the .pickle extension.
+                    The filename gets appended to the absolute path before opening
+                    the file descriptor.
+    
+    Output:
+      Network:      A class object describing the Network class for further processing.
+
+    Raised:
+      IOError:      If the file on the given path does not exist, it will raise a IOError
+    """
     file_path = os.path.join(os.path.abspath(path), filename)
     if not os.path.isfile(file_path):
       raise IOError(f"File {filename} cannot be found in {os.path.abspath(path)}")
@@ -182,8 +335,13 @@ class Network():
       model = pickle.load(file)
     return model
 
-  def train(self, output_results: bool = False):
+  def train(self, output_results: bool = False) -> None:
+    """ Train the Network for the MNIST Dataset
 
+    Args:
+      output_results:     Indicate if there should be images created during
+                          training.
+    """
     spsa_v = tf.zeros(self.shape)
     
     self.accuracy = []
@@ -272,13 +430,8 @@ if __name__ == '__main__':
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
                   draw_circuits=False, epochs=100, 
-<<<<<<< HEAD
-                  efficient=True, batch=13, 
-                  shuffle=True, samples=-1, 
-=======
                   efficient=True, batch=52, 
                   shuffle=True, samples=6000, 
->>>>>>> 13c06391614116986588f582c74a66abbc2b1c6a
                   shots=1025,
                   circuit_type='experimental',
                   param_a=0.05,
@@ -288,25 +441,9 @@ if __name__ == '__main__':
                   param_eta=1,
                   param_s=0.602,
                   param_t=0.101,
-<<<<<<< HEAD
-                  param_b=0.01
-=======
                   param_b=0.01,
                   perf_metrics=True
->>>>>>> 13c06391614116986588f582c74a66abbc2b1c6a
                   )
   model.train(output_results=True)
   model.predict()
   model.save_model()
-
-
-# d = Dataset(image_size=8, enable_transformations=True, enable_log=True, filter=True, filter_by={3: "1", 7: "0"})
-
-# plt.imshow(d.get_image(), cmap='gray')
-# plt.show()
-
-# # m = QuantumOperator(circuit_dimension=256, debug_log=True)
-
-# # r = m.execute(d.get_image(), draw=True)
-
-# # print(r)
