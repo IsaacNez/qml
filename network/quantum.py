@@ -1,6 +1,5 @@
 """ Class definition for the Quantum Operator """
-from cgitb import enable
-import sys
+import os
 import numpy as np
 from typing import *
 import tensorflow as tf
@@ -60,7 +59,7 @@ class QuantumOperator():
     self.show_gpu_support = show_gpu_support
     self.enable_gpu = enable_gpu
   
-  def feature_map(self, image: tf.Tensor) -> tf.Tensor:
+  def feature_map(self, image: np.ndarray) -> np.ndarray:
     """ Maps a normalized input image to the feature map
         given by x -> |Φ> = [cos(x_1*pi/2) sin(x_1*pi/2) ] ⊗ ... ⊗  [cos(x_n*pi/2) sin(x_n*pi/2) ]
         where n is the number of pixels.
@@ -69,7 +68,7 @@ class QuantumOperator():
       image:        Normalized image of size (N, N)
   
     Output:
-      ft_map:       Feature map of size (N, 2)
+      ft_map:       Feature map of size (N*N, 2)
     """
     ft_map = np.zeros((image.shape[0], 2))
     for index, value in enumerate(image):
@@ -377,4 +376,61 @@ class QuantumOperator():
     quantum_circuit.measure([3], [0])
 
     return quantum_circuit
+
+  def plot_circuits(self, image_size: int = 4, circuits: list = ["normal"], path: str = "circuits/", filename: str = "circuit", extension: str = "png", output_format: str = "mpl") -> None:
+    """ Only plot function for the Quantum Operator
+
+        Plot a generic version of the circuits. It creates a Gaussian distributed image 
+        as the input. 
+
+    Args:
+      image_size:       Size of the image to generate.
+
+      circuits:         Type of circuits to generate. It accepts 'normal', 'efficient',
+                        and 'experimental'.
+
+      path:             Path where the circuit images must be stored. It accepts both relative
+                        and absolute paths. Before saving the drawings, it will check if the path
+                        exist, if it does not, it will be created.
+
+      filename:         Base filename of the resulting circuit. The final filename will be composed by
+                        this argument, the circuit type, the image size, and the extension.
+
+      extension:        It defines the type of file to generate. Be aware the output_format must support
+                        your extension. For more info, refer to Qiskit documentation.
+
+      output_format:    The backend to render the circuit. It is passed down to Qiskit.
+    """
+    for circuit_type in circuits:
+      if circuit_type == 'normal' or circuit_type == 'experimental':
+        weights = tf.random.normal((self.circuit_dimension - 1, self.unitary_dimension ** 2))
+        unitaries = self.unitary_matrices(weights=weights).numpy()
+      else:
+        weights = tf.random.normal((self.circuit_dimension - 3, (self.unitary_dimension * 2) ** 2))
+        unitaries = self.unitary_matrices(weights=weights, unitary_dimension=self.unitary_dimension**2).numpy()
+
+      image = np.random.normal((image_size, image_size))
+
+      ft_map = self.feature_map(image.flatten())
+
+      if circuit_type == 'efficient':
+        quantum_circuit = self.gen_efficient_circuit(ft_map, unitaries)
+      elif circuit_type == 'normal':
+        quantum_circuit = self.gen_normal_circuit(ft_map, unitaries)
+      elif circuit_type == 'experimental':
+        quantum_circuit = self.gen_experimental_circuit(ft_map, unitaries)
+      else:
+        raise ValueError(f"circuit_type can only be normal, efficient or experimental. We received: {circuit_type}")
+
+      abs_path = os.path.abspath(path)
+      if not os.path.exists(abs_path):
+        os.makedirs(abs_path)
+
+      abs_filename = os.path.join(abs_path, f"{filename}_{circuit_type}_{image_size}x{image_size}.{extension}")
+      fig = quantum_circuit.draw(output=output_format, filename=abs_filename)
+      fig.clf()
+
+
+
+
 

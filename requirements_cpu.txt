@@ -1,6 +1,7 @@
 tensorflow
 tensorflow-probability
 numpy
+scipy
 matplotlib
 qiskit
 qiskit-aer

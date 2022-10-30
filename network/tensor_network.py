@@ -154,6 +154,14 @@ class Network():
 
     self.qcircuit = QuantumOperator(circuit_dimension=self.circuit_dim, draw_circuit=draw_circuits, show_gpu_support=False, enable_gpu=False)
   
+  def set_quantum_operator(self, quantum_op: QuantumOperator = None) -> None:
+    if quantum_op is None:
+      raise ValueError("The new Quantum Operator Class cannot be empty")
+    
+    self.qcircuit = quantum_op
+
+  def get_quantum_operator(self) -> QuantumOperator:
+    return self.qcircuit
 
   def loss(self, prediction: dict, label: str, classes: dict) -> Tuple[float, int]:
     """ Loss Function per image 
@@ -397,7 +405,7 @@ class Network():
         self.weights -= g *beta_k* delta
 
         
-        if output_results and total_batches // 2 == num_batch:
+        if output_results and (total_batches // 2 == num_batch or num_batch == 0):
           tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"circuit_{self.circuit_type}_loss_{self.image_size}x{self.image_size}.png", marker='.')
           tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda+\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
           tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda-\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
@@ -447,3 +455,7 @@ if __name__ == '__main__':
   model.train(output_results=True)
   model.predict()
   model.save_model()
+
+  qc = model.get_quantum_operator()
+  qc.plot_circuits(4, ["normal", "efficient", "experimental"])
+  qc.plot_circuits(8, ["normal", "efficient", "experimental"])

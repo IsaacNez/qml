@@ -5,7 +5,17 @@
 ### **Description**
 This project implementes the discriminative algorithm described in [Towards Quantum Machine Learning with Tensor Networks](https://arxiv.org/pdf/1803.11537.pdf) using [Qiskit](https://qiskit.org/). It provides three types of circuits: base, efficient, and experimental. The latter two are described in the paper while the experimental is created by me seeking to improve the shortcomings of the models proposed in the paper.
 
+#### **Base Circuit**
+
+![Base circuit](circuits/circuit_normal_8x8.png)
+
+#### **Efficient Circuit**
+
+![Efficient circuit](circuits/circuit_efficient_8x8.png)
+
 #### **Experimental Circuit**
+
+![Experimental circuit](circuits/circuit_experimental_8x8.png)
 
 ### **Installation**
 
