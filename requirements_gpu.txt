@@ -6,3 +6,4 @@ scipy
 qiskit
 qiskit-aer-gpu
 pylatexenc
+notebook

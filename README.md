@@ -67,3 +67,12 @@ or you can import by specifying in your Python file
 `import network.tensor_network`
 
 Since the Network is implemented as a Class, your class can inherit from the `Network` class.
+
+### **Presentation**
+To run the presentation, inside the `qml` folder, run the following command:
+
+```
+jupyter nbconvert presentation/presentation.ipynb --to slides --post serve
+```
+
+After executing said command, it should launch a tab on your browser.
