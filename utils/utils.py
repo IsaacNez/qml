@@ -114,12 +114,12 @@ def generate_plot(x_value: list or np.ndarray or tf.Tensor = None,
 
   num_points = len(y_value)
   if show_max and num_points > 4:
-    max = max(y_value)
+    max_y = max(y_value)
     half_x = num_points // 2
-    plt.axhline(y=max, colors="red", linestyle="--")
-    plt.annotate(f"{max}",
-      xy=(half_x, max),
-      xytext=(int(half_x+0.5*half_x), int(max + 0.5*max)),
+    plt.axhline(y=max_y, color="red", linestyle="--")
+    plt.annotate(f"{max_y}",
+      xy=(half_x, max_y),
+      xytext=(half_x+0.5*half_x, max_y + 0.5*max_y),
       color="red",
       fontsize=fontsize,
       arrowprops=dict(facecolor="red")

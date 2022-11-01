@@ -1,3 +1,4 @@
+joblib
 tensorflow-gpu
 tensorflow-probability
 numpy

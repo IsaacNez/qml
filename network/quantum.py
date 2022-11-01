@@ -70,6 +70,7 @@ class QuantumOperator():
     Output:
       ft_map:       Feature map of size (N*N, 2)
     """
+
     ft_map = np.zeros((image.shape[0], 2))
     for index, value in enumerate(image):
       ft_map[index][0] = np.cos(np.pi / 2 * value)
@@ -366,7 +367,7 @@ class QuantumOperator():
       quantum_circuit.reset(reset_indexes[idx%2][0])
       quantum_circuit.reset(reset_indexes[idx%2][1])
       quantum_circuit.initialize(features[2*index + 4], reset_indexes[idx%2][0])
-      quantum_circuit.initialize(features[2*index + 5], reset_indexes[idx%2][0])
+      quantum_circuit.initialize(features[2*index + 5], reset_indexes[idx%2][1])
       quantum_circuit.unitary(unitaries[2*index + 2], quantum_circuit.qubits[0:2], f'$U_{{{2*index + 2}}}$')
       quantum_circuit.unitary(unitaries[2*index + 3], quantum_circuit.qubits[2:4], f'$U_{{{2*index + 3}}}$')
       # idx += 1
@@ -401,16 +402,17 @@ class QuantumOperator():
 
       output_format:    The backend to render the circuit. It is passed down to Qiskit.
     """
+    self.circuit_dimension = image_size*image_size
     for circuit_type in circuits:
+      print(f"Creating the {circuit_type} circuit")
       if circuit_type == 'normal' or circuit_type == 'experimental':
         weights = tf.random.normal((self.circuit_dimension - 1, self.unitary_dimension ** 2))
         unitaries = self.unitary_matrices(weights=weights).numpy()
       else:
-        weights = tf.random.normal((self.circuit_dimension - 3, (self.unitary_dimension * 2) ** 2))
+        weights = tf.random.normal((self.circuit_dimension - 3, (self.unitary_dimension ** 2) ** 2))
         unitaries = self.unitary_matrices(weights=weights, unitary_dimension=self.unitary_dimension**2).numpy()
 
-      image = np.random.normal((image_size, image_size))
-
+      image = np.random.normal(size=(image_size, image_size))
       ft_map = self.feature_map(image.flatten())
 
       if circuit_type == 'efficient':
