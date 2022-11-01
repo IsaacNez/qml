@@ -240,11 +240,12 @@ class Network():
     idx_data, idx_label = batch
     total_loss, total_correct = 0.0, 0
     
-    jobs = os.cpu_count()
+    num_cpus = os.cpu_count()
+    self.jobs = num_cpus if num_cpus < batch[0].shape[0] else batch[0].shape[0]
     
     if len(devices) > 1:
-      jobs += len(devices) - 1
-    results = Parallel(n_jobs=int(jobs), backend='loky')(delayed(self.execute)(image, label, weights, self.circuit_type, classes, device) for image, label, device in zip(idx_data, idx_label, cycle(devices)))
+      self.jobs += len(devices) - 1
+    results = Parallel(n_jobs=int(self.jobs), backend='loky')(delayed(self.execute)(image, label, weights, self.circuit_type, classes, device) for image, label, device in zip(idx_data, idx_label, cycle(devices)))
 
     for values in results:
       total_loss += values[0]
@@ -276,12 +277,15 @@ class Network():
     """
     if self.enable_log:
       print("Starting testing...")
+
+    gc.collect()
+
     jobs = os.cpu_count()
     
     if len(devices) > 1:
       jobs += len(devices) - 1
 
-    results = Parallel(n_jobs=int(jobs))(delayed(self.qcircuit.execute)(image=sample[0], weights=self.weights, efficient=self.efficient, device=device, shots=self.shots, circuit_type=self.circuit_type) for sample, device in zip(self.dataset.get_test_samples(), cycle(devices)))
+    results = Parallel(n_jobs=int(self.jobs))(delayed(self.qcircuit.execute)(image=sample[0], weights=self.weights, device=device, shots=self.shots, circuit_type=self.circuit_type) for sample, device in zip(self.dataset.get_test_samples(), cycle(devices)))
     
     prediction_correct = 0
 
@@ -359,7 +363,8 @@ class Network():
     self.correct_l1 = []
     self.correct_l2 = []
 
-    total_batches = self.dataset.get_dataset_size() // self.batch
+    mod_batch = self.dataset.get_dataset_size() % self.batch
+    total_batches = self.dataset.get_dataset_size() // self.batch + (1 if mod_batch != 0 else 0)
 
     for epoch in range(self.epochs + 1):
       alpha_k = self.param_a / (epoch + self.param_A + 1) ** self.param_s
@@ -399,18 +404,18 @@ class Network():
         self.correct_l1.append(correct / batch[0].shape[0])
         self.correct_l2.append(correct_2 / batch[0].shape[0])
         
-        # spsa_v = self.param_gamma * spsa_v - g * beta_k * tf.math.reciprocal_no_nan(delta)
+        # spsa_v = self.param_gamma * spsa_v - g * beta_k * delta
 
         # self.weights = self.weights + spsa_v
         self.weights -= g *beta_k* delta
 
         
-        if output_results and (total_batches // 2 == num_batch or num_batch == 0):
+        if output_results and (total_batches // 2 == num_batch or num_batch == 0 or total_batches - 1 == num_batch):
           tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"circuit_{self.circuit_type}_loss_{self.image_size}x{self.image_size}.png", marker='.')
-          tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda+\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
-          tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda-\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
-          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy (%)", title=r"Accuracy for $L(\Lambda+\alpha\Delta$)", save_plot=True, filename=f"circuit_{self.circuit_type}accuracy_L1_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
-          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy (%)", title=r"Accuracy for $L(\Lambda-\alpha\Delta$)", save_plot=True, filename=f"circuit_{self.circuit_type}accuracy_L2_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
+          tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda+\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}_total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda-\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}_total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
+          tl.generate_plot(y_value=self.correct_l1, x_label="Total Batches", y_label="Accuracy (%)", title=r"Accuracy for $L(\Lambda+\alpha\Delta$)", save_plot=True, filename=f"circuit_{self.circuit_type}_accuracy_L1_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
+          tl.generate_plot(y_value=self.correct_l2, x_label="Total Batches", y_label="Accuracy (%)", title=r"Accuracy for $L(\Lambda-\alpha\Delta$)", save_plot=True, filename=f"circuit_{self.circuit_type}_accuracy_L2_{self.image_size}x{self.image_size}.png", ylim=[0,1], marker='.')
 
         epoch_correct += int((correct + correct_2)/2)
         num_batch += 1
@@ -428,7 +433,11 @@ class Network():
       self.accuracy.append(epoch_correct / self.dataset.get_dataset_size())
       
       if output_results:
-        tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, ylim=[0,1], filename=f"circuit_{self.circuit_type}accuracy_{self.image_size}x{self.image_size}.png", marker='o')
+        tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, ylim=[0,1], filename=f"circuit_{self.circuit_type}_accuracy_{self.image_size}x{self.image_size}.png", show_max=True, marker='o')
+    
+    del spsa_v
+
+    gc.collect()
 
 
 if __name__ == '__main__':
@@ -437,11 +446,11 @@ if __name__ == '__main__':
   model = Network(image_size=image_size, 
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
-                  draw_circuits=False, epochs=100, 
-                  efficient=True, batch=52, 
-                  shuffle=True, samples=6000, 
+                  draw_circuits=False, epochs=50, 
+                  efficient=True, batch=222, 
+                  shuffle=True, samples=4000, 
                   shots=1025,
-                  circuit_type='experimental',
+                  circuit_type='efficient',
                   param_a=0.05,
                   param_A=5,
                   param_lambda=0,
@@ -453,8 +462,8 @@ if __name__ == '__main__':
                   perf_metrics=True
                   )
   model.train(output_results=True)
-  model.predict()
   model.save_model()
+  model.predict()
 
   qc = model.get_quantum_operator()
   qc.plot_circuits(4, ["normal", "efficient", "experimental"])

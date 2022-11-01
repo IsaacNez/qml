@@ -1,3 +1,4 @@
+joblib
 tensorflow
 tensorflow-probability
 numpy
@@ -7,3 +8,4 @@ qiskit
 qiskit-aer
 pylatexenc
 notebook
+jupyter_latex_envs

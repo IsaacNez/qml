@@ -1,3 +1,4 @@
+joblib
 tensorflow-gpu
 tensorflow-probability
 numpy
@@ -7,3 +8,4 @@ qiskit
 qiskit-aer-gpu
 pylatexenc
 notebook
+jupyter_latex_envs
