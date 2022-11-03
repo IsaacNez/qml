@@ -7,4 +7,5 @@ matplotlib
 qiskit
 qiskit-aer
 pylatexenc
+notebook
 jupyter_latex_envs

@@ -7,3 +7,5 @@ scipy
 qiskit
 qiskit-aer-gpu
 pylatexenc
+notebook
+jupyter_latex_envs
