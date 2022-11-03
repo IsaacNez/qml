@@ -366,6 +366,8 @@ class Network():
     mod_batch = self.dataset.get_dataset_size() % self.batch
     total_batches = self.dataset.get_dataset_size() // self.batch + (1 if mod_batch != 0 else 0)
 
+    save_idxs = list(range(0, total_batches, self.batch))
+    save_idxs.append(total_batches-1)
     for epoch in range(self.epochs + 1):
       alpha_k = self.param_a / (epoch + self.param_A + 1) ** self.param_s
       beta_k  = self.param_b / (epoch + 1) ** self.param_t
@@ -410,7 +412,7 @@ class Network():
         self.weights -= g *beta_k* delta
 
         
-        if output_results and (total_batches // 2 == num_batch or num_batch == 0 or total_batches - 1 == num_batch):
+        if output_results and num_batch in save_idxs:
           tl.generate_plot(y_value=self.loss_g, x_label="Total Batches", y_label="Modified SPSA Loss", title="Training Convergence", save_plot=True, filename=f"circuit_{self.circuit_type}_loss_{self.image_size}x{self.image_size}.png", marker='.')
           tl.generate_plot(y_value=self.loss_l1, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda+\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}_total_loss_L1_{self.image_size}x{self.image_size}.png", marker='.')
           tl.generate_plot(y_value=self.loss_l2, x_label="Total Batches", y_label=r"SPSA Loss $L(\Lambda-\alpha\Delta$)", title="Total Loss", save_plot=True, filename=f"circuit_{self.circuit_type}_total_loss_L2_{self.image_size}x{self.image_size}.png", marker='.')
@@ -441,13 +443,13 @@ class Network():
 
 
 if __name__ == '__main__':
-  image_size = 8
+  image_size = 4
   classes = {0: "1", 1: "0"}
   model = Network(image_size=image_size, 
                   circuit_dim=image_size*image_size, 
                   classes=classes, enable_log=True, 
                   draw_circuits=False, epochs=50, 
-                  efficient=True, batch=222, 
+                  efficient=True, batch=20, 
                   shuffle=True, samples=4000, 
                   shots=1025,
                   circuit_type='efficient',
