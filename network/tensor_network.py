@@ -366,7 +366,7 @@ class Network():
     mod_batch = self.dataset.get_dataset_size() % self.batch
     total_batches = self.dataset.get_dataset_size() // self.batch + (1 if mod_batch != 0 else 0)
 
-    save_idxs = list(range(0, total_batches, self.batch))
+    save_idxs = list(range(0, total_batches, int(0.1*total_batches)))
     save_idxs.append(total_batches-1)
     for epoch in range(self.epochs + 1):
       alpha_k = self.param_a / (epoch + self.param_A + 1) ** self.param_s
@@ -450,11 +450,11 @@ if __name__ == '__main__':
                   classes=classes, enable_log=True, 
                   draw_circuits=False, epochs=50, 
                   efficient=True, batch=20, 
-                  shuffle=True, samples=4000, 
+                  shuffle=True, samples=2000, 
                   shots=1025,
-                  circuit_type='efficient',
+                  circuit_type='experimental',
                   param_a=0.05,
-                  param_A=5,
+                  param_A=2,
                   param_lambda=0,
                   param_gamma=1,
                   param_eta=1,
