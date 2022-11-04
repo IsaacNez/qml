@@ -1,0 +1,15 @@
+\BOOKMARK [1][-]{section.1}{Tensor Networks with Qiskit}{}% 1
+\BOOKMARK [2][-]{subsubsection.1.0.1}{Isaac Nunez}{section.1}% 2
+\BOOKMARK [3][-]{subsubsection.1.0.2}{William Huggins et al. \(2018\) Towards Quantum Machine Learning with Tensor Networks}{subsubsection.1.0.1}% 3
+\BOOKMARK [2][-]{subsection.1.1}{What exactly are Tensors?}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.2}{How do they differ from what we already know?}{section.1}% 5
+\BOOKMARK [2][-]{subsection.1.3}{How do they relate to Quantum Computing?}{section.1}% 6
+\BOOKMARK [2][-]{subsection.1.4}{The bridge between Machine Learning and Quantum Computing}{section.1}% 7
+\BOOKMARK [2][-]{subsection.1.5}{Towards Quantum Machine Learning with Tensor Networks}{section.1}% 8
+\BOOKMARK [3][-]{subsubsection.1.5.1}{Learning on Quantum Circuits}{subsection.1.5}% 9
+\BOOKMARK [3][-]{subsubsection.1.5.2}{How is the model evaluated?}{subsection.1.5}% 10
+\BOOKMARK [3][-]{subsubsection.1.5.3}{How to minimize the loss function?}{subsection.1.5}% 11
+\BOOKMARK [3][-]{subsubsection.1.5.4}{The networks\203}{subsection.1.5}% 12
+\BOOKMARK [3][-]{subsubsection.1.5.5}{The results\203}{subsection.1.5}% 13
+\BOOKMARK [3][-]{subsubsection.1.5.6}{Shortcomings}{subsection.1.5}% 14
+\BOOKMARK [1][-]{section.2}{Future improvements}{}% 15
