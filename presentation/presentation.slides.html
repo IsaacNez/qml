@@ -14683,13 +14683,13 @@ div.jp-OutputPrompt {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <div style="display: inline; border: 0px">
-    <img src="images/tensor_vector.png" style="height: 50%; width: 5%; float: left"/>
+    <img src="./images/tensor_vector.png" style="height: 50%; width: 5%; float: left"/>
 </div>
 <div style="display: inline; border: 0px">
-    <img src="images/tensor_matrix.png" style="height: 40%; width: 15%; float: left"/>
+    <img src="./images/tensor_matrix.png" style="height: 40%; width: 15%; float: left"/>
 </div>
 <div style="display: inline; border: 0px">
-    <img src="images/tensor_3d.png" style="height: 40%; width: 15%; float: left"/>
+    <img src="./images/tensor_3d.png" style="height: 40%; width: 15%; float: left"/>
 </div>
 
 </div>
@@ -14884,10 +14884,10 @@ div.jp-OutputPrompt {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <div style="display: inline; border: 1px">
-    <img src="images/ttn_model.png" style="height: 100%; float: left; width: 30%"/>
+    <img src="./images/ttn_model.png" style="height: 100%; float: left; width: 30%"/>
 </div>
 <div style="display: inline; border: 1px">
-    <img src="images/mps_model.png" style="height: 100%; float: right; width: 30%"/>
+    <img src="./images/mps_model.png" style="height: 100%; float: right; width: 30%"/>
 </div>
 
 </div>
@@ -14982,13 +14982,11 @@ $$x \mapsto |\Phi(x)\rangle=\left[{\cos\left(\frac{\pi}{2}x_1\right) \atop \sin\
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-$$
 \begin{align}
 p_{max false}(\Lambda, x) &amp;= \max_{l \neq l_x}[p_l(\Lambda, x)]\nonumber\\
 L(\Lambda, x) &amp;= \max(p_{max false}(\Lambda, x) - p_{l_x}(\Lambda, x) + \lambda, 0)^\eta\nonumber\\
-L(x) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, x)\label{eq:loss_equation}
+L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, x)\label{eq:loss_equation}
 \end{align}
-$$
 </div>
 </div>
 </div>
@@ -15028,9 +15026,9 @@ $$
 <li>Choose the hyperparameters $a$, $b$, $A$, $s$, $t$, $\gamma$, $n$, and $M$</li>
 <li>For each $k \in \{0,1,\dots, M\}$, divide the dataset into random batches of $n$ images and:<ol>
 <li>Choose $\alpha_k = \dfrac{a}{(k+1+A)^s}$ and $\beta_k = \dfrac{b}{(k+1)^t}$</li>
-<li>Generate a perturbation $\delta$.</li>
-<li>Evaluate $g = \dfrac{L(\Lambda_k + \alpha_k\delta) - L(\Lambda_k - \alpha_k\delta)}{2\cdot\alpha_k}$ with $L(x)$ as defined in $\eqref{eq:loss_equation}$</li>
-<li>$v_{new} = \gamma\cdot v_{old} - g\cdot\beta_k\cdot\delta$</li>
+<li>Generate a perturbation $\Delta$.</li>
+<li>Evaluate $g = \dfrac{L(\Lambda_k + \alpha_k\Delta) - L(\Lambda_k - \alpha_k\Delta)}{2\cdot\alpha_k}$ with $L(\Lambda)$ as defined in $\eqref{eq:loss_equation}$</li>
+<li>$v_{new} = \gamma\cdot v_{old} - g\cdot\beta_k\cdot\Delta$</li>
 <li>$\Lambda_{new} = \Lambda_{old} + v_{new}$</li>
 </ol>
 </li>
@@ -15057,7 +15055,7 @@ $$
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="The-base-model">The base model<a class="anchor-link" href="#The-base-model">&#182;</a></h4><img src="../circuits/circuit_normal_4x4.png" style="height: 30%; float: left"/>
+<h4 id="The-base-model">The base model<a class="anchor-link" href="#The-base-model">&#182;</a></h4><img src="../circuits/circuit_normal_4x4.png" style="height: 100%; width: 35%; float: left"/>
 
 </div>
 </div>
@@ -15104,19 +15102,41 @@ $$
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>They claimed above  <font color="green" style="font-weight: bold">95%</font> accuracy yet during training, accuracy was not above <font color="red" style="font-weight: bold">55%</font></p>
+<div style="display: inline">
+    <img src="../final/efficient/circuit_efficient_accuracy_4x4.png" style="height: 100%; float: left; width: 45%"/>
+</div>
+<div style="display: inline">
+    <img src="../final/efficient/circuit_efficient_accuracy_8x8.png" style="height: 100%; float: right; width: 45%"/>
+</div>
 
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Despite the batch size defined by the authors, the models performed better using a <font color="red" style="font-weight: bold">smaller</font> batch size.</p>
+<p>They claimed above  <font color="green" style="font-weight: bold">95%</font> accuracy yet during training, accuracy was not above <font color="red" style="font-weight: bold">55%</font></p>
+
+</div>
+</div>
+</div>
+</div><div class="fragment" >
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<div style="display: inline">
+    <img src="../final/efficient/circuit_efficient_loss_4x4.png" style="height: 100%; float: left; width: 45%"/>
+</div>
+<div style="display: inline">
+    <img src="../final/efficient/circuit_efficient_loss_8x8.png" style="height: 100%; float: right; width: 45%"/>
+</div>
 
 </div>
 </div>
