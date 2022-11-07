@@ -50,7 +50,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
 .highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
 .highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
-.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
 .highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
 .highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
 .highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
@@ -14599,14 +14598,17 @@ div.jp-OutputPrompt {
 
 /* Scrollbars */
 
-::-webkit-scrollbar {
+::-webkit-scrollbar
+{
   width: 6px;
   height: 6px;
 }
-::-webkit-scrollbar * {
-  background: transparent;
+::-webkit-scrollbar *
+{
+  background:transparent;
 }
-::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb
+{
   background: #727272 !important;
 }
 </style>
@@ -14633,12 +14635,12 @@ div.jp-OutputPrompt {
                 },
                 displayAlign: 'center',
                 CommonHTML: {
-                    linebreaks: {
-                    automatic: true
+                    linebreaks: { 
+                    automatic: true 
                     }
                 }
             });
-
+        
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
     }
@@ -14652,7 +14654,7 @@ div.jp-OutputPrompt {
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 
 <div class="reveal">
-<div class="slides"><section ><section >
+<div class="slides"><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14663,7 +14665,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14675,7 +14677,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14691,11 +14693,10 @@ div.jp-OutputPrompt {
 <div style="display: inline; border: 0px">
     <img src="./images/tensor_3d.png" style="height: 40%; width: 15%; float: left"/>
 </div>
-
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14707,7 +14708,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14716,22 +14717,22 @@ div.jp-OutputPrompt {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <ol>
 <li><strong>Tensor products ($\otimes$):</strong> they are a generalization of the outer product of vectors.
- <img src="images/tensor_product.png" alt="tensor_product" /></li>
+ <img src="images/tensor_product.png" alt="tensor_product"></li>
 </ol>
 
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ol start="2">
+<ol>
 <li><p><strong>Contraction</strong>: it abstracts vector inner products (or matrix-matrix multiplication).
- <img src="images/contraction.png" alt="contraction" /></p>
+ <img src="images/contraction.png" alt="contraction"></p>
 <p>It can also be understood through the <em>Einstein Notation</em> where:
  $$C^{k}_{l} = \sum_{i,j} A^{k}_{i,j}\cdot B^{i,j}_{l}$$</p>
 </li>
@@ -14740,7 +14741,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14751,7 +14752,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14763,7 +14764,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14776,7 +14777,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14787,7 +14788,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14799,7 +14800,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14811,7 +14812,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14823,7 +14824,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14834,7 +14835,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14846,7 +14847,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14864,7 +14865,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14876,7 +14877,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14889,11 +14890,10 @@ div.jp-OutputPrompt {
 <div style="display: inline; border: 1px">
     <img src="./images/mps_model.png" style="height: 100%; float: right; width: 30%"/>
 </div>
-
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14904,7 +14904,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14916,7 +14916,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14928,7 +14928,7 @@ $$x \mapsto |\Phi(x)\rangle=\left[{\cos\left(\frac{\pi}{2}x_1\right) \atop \sin\
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14940,7 +14940,7 @@ $$x \mapsto |\Phi(x)\rangle=\left[{\cos\left(\frac{\pi}{2}x_1\right) \atop \sin\
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14952,7 +14952,7 @@ $$x \mapsto |\Phi(x)\rangle=\left[{\cos\left(\frac{\pi}{2}x_1\right) \atop \sin\
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14963,7 +14963,7 @@ $$x \mapsto |\Phi(x)\rangle=\left[{\cos\left(\frac{\pi}{2}x_1\right) \atop \sin\
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14975,7 +14975,7 @@ $$x \mapsto |\Phi(x)\rangle=\left[{\cos\left(\frac{\pi}{2}x_1\right) \atop \sin\
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14990,7 +14990,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15001,7 +15001,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15013,7 +15013,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15037,7 +15037,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15048,31 +15048,31 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="The-base-model">The base model<a class="anchor-link" href="#The-base-model">&#182;</a></h4><img src="../circuits/circuit_normal_4x4.png" style="height: 100%; width: 35%; float: left"/>
+<h4 id="The-base-model">The base model<a class="anchor-link" href="#The-base-model">&#182;</a></h4><p><img src="../circuits/circuit_normal_4x4.png" style="height: 100%; width: 35%; float: left"/></p>
 
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="The-efficient-model">The efficient model<a class="anchor-link" href="#The-efficient-model">&#182;</a></h4><img src="../circuits/circuit_efficient_4x4.png" style="height: 60%; float: left"/>
+<h4 id="The-efficient-model">The efficient model<a class="anchor-link" href="#The-efficient-model">&#182;</a></h4><p><img src="../circuits/circuit_efficient_4x4.png" style="height: 60%; float: left"/></p>
 
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15083,7 +15083,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15095,7 +15095,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div></div><div class="fragment" >
+</div></div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15108,11 +15108,10 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 <div style="display: inline">
     <img src="../final/efficient/circuit_efficient_accuracy_8x8.png" style="height: 100%; float: right; width: 45%"/>
 </div>
-
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15124,7 +15123,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15137,11 +15136,10 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 <div style="display: inline">
     <img src="../final/efficient/circuit_efficient_loss_8x8.png" style="height: 100%; float: right; width: 45%"/>
 </div>
-
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15152,7 +15150,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15160,20 +15158,22 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <ul>
-<li><p>My testing was using the efficient architecture yet the authors only tested the base model.</p>
-</li>
-<li><p>The base model has 1008 parameters for an image of 8x8 while the efficient one has 15616.</p>
-</li>
-<li><p>The chosen hyperparameters are only for the base model.</p>
-</li>
-<li><p>The hyperparameters are outside the range of convergence required by the authors of SPSA.</p>
-</li>
+<li>My testing was using the efficient architecture yet the authors only tested the base model.</li>
+</ul>
+<ul>
+<li>The base model has 1008 parameters for an image of 8x8 while the efficient one has 15616.</li>
+</ul>
+<ul>
+<li>The chosen hyperparameters are only for the base model.</li>
+</ul>
+<ul>
+<li>The hyperparameters are outside the range of convergence required by the authors of SPSA.</li>
 </ul>
 
 </div>
 </div>
 </div>
-</div></div></section></section><section ><section >
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15181,20 +15181,22 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <ul>
-<li><p>The authors did not test the efficient model nor they proposed hyperparameters for it.</p>
-</li>
-<li><p>After almost two weeks running the base model, the training accuracy was not higher than <font color="red" style="font-weight: bold">65%</font></p>
-</li>
-<li><p>Smaller batch sizes show a small improvement in a short term.</p>
-</li>
-<li><p>The authors did not use Tensorflow, Tensornetwork, and/or Qiskit for their development but rather they own C++ Tensor Library. <font color="red">The code for their paper is not available.</font></p>
-</li>
+<li>The authors did not test the efficient model nor they proposed hyperparameters for it.</li>
+</ul>
+<ul>
+<li>After almost two weeks running the base model, the training accuracy was not higher than <font color="red" style="font-weight: bold">65%</font></li>
+</ul>
+<ul>
+<li>Smaller batch sizes show a small improvement in a short term.</li>
+</ul>
+<ul>
+<li>The authors did not use Tensorflow, Tensornetwork, and/or Qiskit for their development but rather they own C++ Tensor Library. <font color="red">The code for their paper is not available.</font></li>
 </ul>
 
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15205,7 +15207,7 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div><div class="fragment" >
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15213,13 +15215,13 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <ul>
-<li><p>The main author recommends to move from SPSA to the Shift Parameter Rule (SPR) as means to calculate the gradients of a Quantum Circuit.</p>
-<ul>
+<li>The main author recommends to move from SPSA to the Shift Parameter Rule (SPR) as means to calculate the gradients of a Quantum Circuit.<ul>
 <li>The SPR for Unitary gates is called Stochastic SPR and requires <strong>three</strong> times more unitary gates.</li>
 </ul>
 </li>
-<li><p>Many of the examples of SSPR rely on Pytorch for feature extraction and they introduce the Quantum Circuit as another layer on the network. Examples from Qiskit show better accuracy.</p>
-</li>
+</ul>
+<ul>
+<li>Many of the examples of SSPR rely on Pytorch for feature extraction and they introduce the Quantum Circuit as another layer on the network. Examples from Qiskit show better accuracy.</li>
 </ul>
 
 </div>
