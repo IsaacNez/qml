@@ -75,6 +75,7 @@ class Dataset():
 
     (self.image_train, self.label_train), (self.image_test, self.label_test) = tf.keras.datasets.mnist.load_data()
 
+
     even_samples = samples - samples % 2
     half_idx = even_samples // 2
     train_idx = int(0.8*half_idx) if samples > 0 else None
@@ -110,6 +111,7 @@ class Dataset():
       self.image_train, self.image_test = image_train, image_test
 
     self.indices = tf.range(start=0, limit=self.image_train.shape[0], dtype=tf.int32)
+    
     if enable_log:
       print(f"The resulting training dataset has {self.image_train.shape[0]} images and the test one has {self.image_test.shape[0]} images")
 

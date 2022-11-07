@@ -65,7 +65,7 @@ class QuantumOperator():
         where n is the number of pixels.
 
     Args:
-      image:        Normalized image of size (N, N)
+      image:        Normalized and flatten image of size (N*N, ) 
   
     Output:
       ft_map:       Feature map of size (N*N, 2)
@@ -205,7 +205,7 @@ class QuantumOperator():
                           3.  Experimental (experimental): this circuit is my own implementation. It uses 
                               (circuit_size -1) two-qubit unitary gates spread over
                               (circuit_size - 4)/2 layers but it uses only 4 qubits and one classical
-                              register. This circuit uses (circuit_size - 1)*(unitary_size^2)
+                              register. This circuit uses (circuit_size - 1)*(unitary_size^2) trainable parameters
       
       device:           It specifies the device to place the data. For GPU-enable systems, it offers Hardware 
                         Acceleration for Tensorflow operations. By default, it uses the CPU.
@@ -213,12 +213,18 @@ class QuantumOperator():
     Output:
       counts:           It returns the result from the binary classification with the counts per class in the form
                         {"0": x, "1": y}, where x + y = shots. If there is an error, it will return None.
-          
+
+    Raises:
+      ValueError:       - If image is not given, it will raise a ValueError since it is needed to calculate the feature map.
+                        - If the filename is not given (when drawing the circuit), it will raise the exception since the class
+                          does not support saving to empty filenames.
+                        - If the circuit_type is not one of the three allowed names, it will raise the exception since it is 
+                          unknown behavior.
     """
     if image is None:
       raise ValueError("The image cannot be None. Please pass an image.")
     
-    if len(filename) <= 0:
+    if len(filename) <= 0 and draw:
       raise ValueError("Please indicate a name for the filename")
 
     tf.device(device)

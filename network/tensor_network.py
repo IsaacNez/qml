@@ -45,7 +45,8 @@ class Network():
                       circuit_type: str = 'normal',
                       shuffle: bool = False,
                       perf_metrics: bool = False,
-                      samples: int = -1) -> 'Network':
+                      samples: int = -1,
+                      original_form: bool = False) -> 'Network':
     """ Creates the Network and defines the required parameters 
 
     Args:
@@ -99,6 +100,9 @@ class Network():
 
       samples:                        It defines how many samples the Dataset class should generate. For more on this 
                                       parameter, read the documentation for the Dataset class.
+
+      original_form:                  It determines which update rule for the weights to use. By default, it uses an 
+                                      standard weight update avoiding the momemtum factor.
     """
     self.image_size         = image_size
     self.circuit_dim        = circuit_dim
@@ -122,6 +126,7 @@ class Network():
     self.efficient          = efficient
     self.shuffle            = shuffle
     self.perf_metrics       = perf_metrics
+    self.original_form      = original_form
 
 
     if self.circuit_type == 'normal' or self.circuit_type == 'experimental':
@@ -155,12 +160,20 @@ class Network():
     self.qcircuit = QuantumOperator(circuit_dimension=self.circuit_dim, draw_circuit=draw_circuits, show_gpu_support=False, enable_gpu=False)
   
   def set_quantum_operator(self, quantum_op: QuantumOperator = None) -> None:
+    """ Replace the QuantumOperator for the Network Class 
+    
+    Args:
+      quantum_op:     A child class from QuantumOperator. Be aware of the 
+                      dimensions for the circuit and unitary gates.
+
+    """
     if quantum_op is None:
       raise ValueError("The new Quantum Operator Class cannot be empty")
     
     self.qcircuit = quantum_op
 
   def get_quantum_operator(self) -> QuantumOperator:
+    """ Return the QuantumOperator for the Network Class """
     return self.qcircuit
 
   def loss(self, prediction: dict, label: str, classes: dict) -> Tuple[float, int]:
@@ -336,7 +349,7 @@ class Network():
     Output:
       Network:      A class object describing the Network class for further processing.
 
-    Raised:
+    Raises:
       IOError:      If the file on the given path does not exist, it will raise a IOError
     """
     file_path = os.path.join(os.path.abspath(path), filename)
@@ -363,12 +376,15 @@ class Network():
     self.correct_l1 = []
     self.correct_l2 = []
 
+    # Get idxs to generate images to speedup computation and avoid 
+    # generating images every batch.
     mod_batch = self.dataset.get_dataset_size() % self.batch
     total_batches = self.dataset.get_dataset_size() // self.batch + (1 if mod_batch != 0 else 0)
-
     save_idxs = list(range(0, total_batches, int(0.1*total_batches)))
     save_idxs.append(total_batches-1)
+
     for epoch in range(self.epochs + 1):
+
       alpha_k = self.param_a / (epoch + self.param_A + 1) ** self.param_s
       beta_k  = self.param_b / (epoch + 1) ** self.param_t
 
@@ -380,11 +396,6 @@ class Network():
       num_batch = 0
       for batch in self.dataset.get_batch(batch=self.batch):
         print(f"Batch: {num_batch}")
-        # b = self.param_b
-        # mean = tf.math.reduce_mean(batch[0]) / (2*b)
-        # a = self.param_a/mean
-        # alpha_k = a / (epoch + mean + 1) ** self.param_s
-        # beta_k  = b / (epoch + 1) ** self.param_t
 
         delta = tfp.distributions.Binomial(batch[0].shape[0], probs=0.5).sample(sample_shape=self.shape)
 
@@ -406,10 +417,11 @@ class Network():
         self.correct_l1.append(correct / batch[0].shape[0])
         self.correct_l2.append(correct_2 / batch[0].shape[0])
         
-        # spsa_v = self.param_gamma * spsa_v - g * beta_k * delta
-
-        # self.weights = self.weights + spsa_v
-        self.weights -= g *beta_k* delta
+        if self.original_form:
+          spsa_v = self.param_gamma * spsa_v - g * beta_k * delta
+          self.weights = self.weights + spsa_v
+        else:
+          self.weights -= g *beta_k* delta
 
         
         if output_results and num_batch in save_idxs:
@@ -437,9 +449,9 @@ class Network():
       if output_results:
         tl.generate_plot(y_value=self.accuracy, x_label="Epochs", y_label="Accuracy (%)", title="Model accuracy", save_plot=True, ylim=[0,1], filename=f"circuit_{self.circuit_type}_accuracy_{self.image_size}x{self.image_size}.png", show_max=True, marker='o')
     
-    del spsa_v
-
-    gc.collect()
+    if self.original_form:
+      del spsa_v
+      gc.collect()
 
 
 if __name__ == '__main__':

@@ -1,2 +1,0 @@
-This implementation uses parameters relevant to the SPSA original algorithm and a optimization from Qiskit. Other
-parameters are dificult to compare because it takes a lot of time for the paramters the original paper specifies.
