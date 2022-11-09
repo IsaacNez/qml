@@ -44,8 +44,8 @@ This project implementes the discriminative algorithm described in [Towards Quan
     * samples = 4000 (3200 for training and 1800 for testing)
 
 [1]: results/experimental_13/circuit_experimental_accuracy_4x4.png "Experimental circuit with batch size of 13 and an image 4x4"
-[2]: results/experimental_20/circuit_experimental_accuracy_4x4.png "Experimental circuit with batch size of 13 and an image 4x4"
-[3]: results/experimental_20/circuit_experimental_accuracy_8x8.png "Experimental circuit with batch size of 13 and an image 8x8"
+[2]: results/experimental_20/circuit_experimental_accuracy_4x4.png "Experimental circuit with batch size of 20 and an image 4x4"
+[3]: results/experimental_20/circuit_experimental_accuracy_8x8.png "Experimental circuit with batch size of 20 and an image 8x8"
 [4]: results/efficient/circuit_efficient_accuracy_4x4.png "Efficient circuit with batch size of 13 and an image 4x4"
 [5]: results/efficient/circuit_efficient_accuracy_8x8.png "Efficient circuit with batch size of 13 and an image 4x4"
 ### **Installation**
