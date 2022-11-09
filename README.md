@@ -65,7 +65,7 @@ If you do not poses root access in your machine, use the **Step 4: GPU Setup** f
 ```bash
 mkdir -p $CONDA_PREFIX/etc/conda/activate.d
 echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/:$HOME/.local' > $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
-echo 'export PYTHONPATH=$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo 'export PYTHONPATH=$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 ```
 
 > Remember to perform this actions while you have the previously Conda environments activated.
