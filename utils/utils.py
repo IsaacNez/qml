@@ -1,9 +1,9 @@
+""" File definition for helper functions """
 import numpy as np
 from typing import *
 import tensorflow as tf
 import matplotlib
 import matplotlib.pyplot as plt
-import sys
 import os
 
 # Enable the Agg backend to avoid 

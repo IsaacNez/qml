@@ -3,7 +3,6 @@ import os
 import numpy as np
 from typing import *
 import tensorflow as tf
-import math as m
 import qiskit
 from qiskit import Aer
 from qiskit_aer import AerError

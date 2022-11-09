@@ -1,5 +1,4 @@
 """Definition of the MNIST Dataset Handler Class"""
-import sys
 from typing import *
 import numpy as np
 import tensorflow as tf
@@ -110,6 +109,7 @@ class Dataset():
     else:
       self.image_train, self.image_test = image_train, image_test
 
+    # Define the idxs here to avoid the same random generation when shuffling them for mini-batch
     self.indices = tf.range(start=0, limit=self.image_train.shape[0], dtype=tf.int32)
     
     if enable_log:
