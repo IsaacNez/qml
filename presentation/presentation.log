@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.7.26)  3 NOV 2022 17:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.7.26)  15 NOV 2022 21:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1300,72 +1300,173 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 
 LaTeX Warning: No \author given.
 
-LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 3
-92.
-(/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
-File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 411.
-LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 
-411.
-
-(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmtt.fd
-File: ts1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
-)
 
 Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 434.
+(hyperref)                than one, level fixed on input line 393.
 
-<images/tensor_product.png, id=68, 907.89188pt x 310.15875pt>
+<images/tensor_vector.png, id=68, 40.65187pt x 65.49469pt>
+File: images/tensor_vector.png Graphic file (type png)
+<use images/tensor_vector.png>
+Package pdftex.def Info: images/tensor_vector.png  used on input line 412.
+(pdftex.def)             Requested size: 40.65176pt x 65.4945pt.
+<images/tensor_matrix.png, id=70, 117.43875pt x 54.9553pt>
+File: images/tensor_matrix.png Graphic file (type png)
+<use images/tensor_matrix.png>
+Package pdftex.def Info: images/tensor_matrix.png  used on input line 413.
+(pdftex.def)             Requested size: 117.43845pt x 54.95515pt.
+<images/tensor_3d.png, id=71, 122.70844pt x 71.51718pt>
+File: images/tensor_3d.png Graphic file (type png)
+<use images/tensor_3d.png>
+Package pdftex.def Info: images/tensor_3d.png  used on input line 414.
+(pdftex.def)             Requested size: 122.70813pt x 71.517pt.
+<images/tensor_product.png, id=72, 907.89188pt x 310.15875pt>
 File: images/tensor_product.png Graphic file (type png)
 <use images/tensor_product.png>
-Package pdftex.def Info: images/tensor_product.png  used on input line 472.
+Package pdftex.def Info: images/tensor_product.png  used on input line 430.
 (pdftex.def)             Requested size: 907.88966pt x 310.15799pt.
 
-Underfull \hbox (badness 1024) in paragraph at lines 470--473
+Underfull \hbox (badness 1024) in paragraph at lines 428--431
 []\T1/cmr/bx/n/10.95 Tensor prod-ucts ($\OMS/cmsy/m/n/10.95 
 $\T1/cmr/bx/n/10.95 ): \T1/cmr/m/n/10.95 they are a gen-er-al-iza-tion of the o
 uter prod-uct of vec-tors.
  []
 
-[1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-<images/contraction.png, id=90, 1172.12906pt x 257.46187pt>
+<images/contraction.png, id=73, 1172.12906pt x 257.46187pt>
 File: images/contraction.png Graphic file (type png)
 <use images/contraction.png>
-Package pdftex.def Info: images/contraction.png  used on input line 481.
+Package pdftex.def Info: images/contraction.png  used on input line 439.
 (pdftex.def)             Requested size: 1172.1262pt x 257.46123pt.
 
-Underfull \hbox (badness 2012) in paragraph at lines 479--482
+Underfull \hbox (badness 2012) in paragraph at lines 437--440
 []\T1/cmr/bx/n/10.95 Contraction\T1/cmr/m/n/10.95 : it ab-stracts vec-tor in-ne
 r prod-ucts (or matrix-matrix mul-ti-pli-ca-tion).
  []
 
-[2 <./images/tensor_product.png> <./images/contraction.png>]
+[1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./images/tensor_vector.png
+> <./images/tensor_matrix.png> <./images/tensor_3d.png> <./images/tensor_produc
+t.png>]
+Overfull \hbox (12.00647pt too wide) in alignment at lines 490--494
+ [] [] 
+ []
+
+<./images/ttn_model.png, id=100, 432.86719pt x 770.88pt>
+File: ./images/ttn_model.png Graphic file (type png)
+<use ./images/ttn_model.png>
+Package pdftex.def Info: ./images/ttn_model.png  used on input line 495.
+(pdftex.def)             Requested size: 432.86612pt x 770.87813pt.
+<./images/mps_model.png, id=101, 577.40718pt x 867.24pt>
+File: ./images/mps_model.png Graphic file (type png)
+<use ./images/mps_model.png>
+Package pdftex.def Info: ./images/mps_model.png  used on input line 496.
+(pdftex.def)             Requested size: 577.40578pt x 867.2379pt.
+
+Overfull \hbox (12.00647pt too wide) in alignment at lines 494--498
+ [] [] 
+ []
+
+[2 <./images/contraction.png>]
 
 Package amsmath Warning: Foreign command \atop;
 (amsmath)                \frac or \genfrac should be used instead
-(amsmath)                 on input line 549.
+(amsmath)                 on input line 509.
 
-[3] [4]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 689.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 689.
- (./presentation.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 689.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 689.
+[3 <./images/ttn_model.png> <./images/mps_model.png>]
+Overfull \hbox (12.01794pt too wide) in alignment at lines 574--578
+ [] [] 
+ []
+
+<../circuits/circuit_normal_4x4.png, id=130, 416.757pt x 823.878pt>
+File: ../circuits/circuit_normal_4x4.png Graphic file (type png)
+<use ../circuits/circuit_normal_4x4.png>
+Package pdftex.def Info: ../circuits/circuit_normal_4x4.png  used on input line
+ 579.
+(pdftex.def)             Requested size: 416.75598pt x 823.87599pt.
+<../circuits/circuit_efficient_4x4.png, id=131, 1244.4894pt x 823.878pt>
+File: ../circuits/circuit_efficient_4x4.png Graphic file (type png)
+<use ../circuits/circuit_efficient_4x4.png>
+Package pdftex.def Info: ../circuits/circuit_efficient_4x4.png  used on input l
+ine 580.
+(pdftex.def)             Requested size: 1244.48637pt x 823.87599pt.
+
+Overfull \hbox (12.01794pt too wide) in alignment at lines 578--582
+ [] [] 
+ []
+
+[4]
+Overfull \hbox (12.00633pt too wide) in alignment at lines 592--597
+ [] [] 
+ []
+
+<../results/efficient/circuit_efficient_accuracy_4x4.png, id=151, 1445.4pt x 10
+84.05pt>
+File: ../results/efficient/circuit_efficient_accuracy_4x4.png Graphic file (typ
+e png)
+<use ../results/efficient/circuit_efficient_accuracy_4x4.png>
+Package pdftex.def Info: ../results/efficient/circuit_efficient_accuracy_4x4.pn
+g  used on input line 598.
+(pdftex.def)             Requested size: 1445.39648pt x 1084.04736pt.
+<../results/efficient/circuit_efficient_accuracy_8x8.png, id=152, 1445.4pt x 10
+84.05pt>
+File: ../results/efficient/circuit_efficient_accuracy_8x8.png Graphic file (typ
+e png)
+<use ../results/efficient/circuit_efficient_accuracy_8x8.png>
+Package pdftex.def Info: ../results/efficient/circuit_efficient_accuracy_8x8.pn
+g  used on input line 600.
+(pdftex.def)             Requested size: 1445.39648pt x 1084.04736pt.
+
+Overfull \hbox (12.00633pt too wide) in alignment at lines 597--602
+ [] [] 
+ []
+
+[5 <../circuits/circuit_normal_4x4.png> <../circuits/circuit_efficient_4x4.png>
+]
+Overfull \hbox (12.00633pt too wide) in alignment at lines 610--615
+ [] [] 
+ []
+
+<../results/efficient/circuit_efficient_loss_4x4.png, id=162, 1445.4pt x 1084.0
+5pt>
+File: ../results/efficient/circuit_efficient_loss_4x4.png Graphic file (type pn
+g)
+<use ../results/efficient/circuit_efficient_loss_4x4.png>
+Package pdftex.def Info: ../results/efficient/circuit_efficient_loss_4x4.png  u
+sed on input line 616.
+(pdftex.def)             Requested size: 1445.39648pt x 1084.04736pt.
+<../results/efficient/circuit_efficient_loss_8x8.png, id=163, 1445.4pt x 1084.0
+5pt>
+File: ../results/efficient/circuit_efficient_loss_8x8.png Graphic file (type pn
+g)
+<use ../results/efficient/circuit_efficient_loss_8x8.png>
+Package pdftex.def Info: ../results/efficient/circuit_efficient_loss_8x8.png  u
+sed on input line 617.
+(pdftex.def)             Requested size: 1445.39648pt x 1084.04736pt.
+
+Overfull \hbox (12.00633pt too wide) in alignment at lines 615--619
+ [] [] 
+ []
+
+[6 <../results/efficient/circuit_efficient_accuracy_4x4.png> <../results/effici
+ent/circuit_efficient_accuracy_8x8.png> <../results/efficient/circuit_efficient
+_loss_4x4.png> <../results/efficient/circuit_efficient_loss_8x8.png>] [7]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 679.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 679.
+
+(./presentation.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 679.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 679.
 Package rerunfilecheck Info: File `presentation.out' has not changed.
 (rerunfilecheck)             Checksum: 2D60F409DA49A0A1754E84CD9ACA5C25;1287.
  ) 
 Here is how much of TeX's memory you used:
- 22195 strings out of 481239
- 402903 string characters out of 5920377
- 644119 words of memory out of 5000000
- 36947 multiletter control sequences out of 15000+600000
- 549381 words of font info for 71 fonts, out of 8000000 for 9000
+ 22193 strings out of 481239
+ 403287 string characters out of 5920377
+ 641319 words of memory out of 5000000
+ 36933 multiletter control sequences out of 15000+600000
+ 547960 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 59i,11n,75p,891b,536s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 59i,12n,75p,891b,426s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/usr/share/texmf/
 fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/texlive/texmf-dist/fonts/
 type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
@@ -1381,12 +1482,11 @@ blic/cm-super/sfbx1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx12
 exmf/fonts/type1/public/cm-super/sfrm0800.pfb></usr/share/texmf/fonts/type1/pub
 lic/cm-super/sfrm1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm120
 0.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1728.pfb></usr/share/te
-xmf/fonts/type1/public/cm-super/sfti1095.pfb></usr/share/texmf/fonts/type1/publ
-ic/cm-super/sftt1095.pfb>
-Output written on presentation.pdf (4 pages, 422844 bytes).
+xmf/fonts/type1/public/cm-super/sfti1095.pfb>
+Output written on presentation.pdf (7 pages, 1385620 bytes).
 PDF statistics:
- 220 PDF objects out of 1000 (max. 8388607)
- 187 compressed objects within 2 object streams
- 50 named destinations out of 1000 (max. 500000)
- 143 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 256 PDF objects out of 1000 (max. 8388607)
+ 199 compressed objects within 2 object streams
+ 58 named destinations out of 1000 (max. 500000)
+ 198 words of extra memory for PDF output out of 10000 (max. 10000000)
 

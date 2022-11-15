@@ -14684,15 +14684,22 @@ div.jp-OutputPrompt {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<div style="display: inline; border: 0px">
-    <img src="./images/tensor_vector.png" style="height: 50%; width: 5%; float: left"/>
-</div>
-<div style="display: inline; border: 0px">
-    <img src="./images/tensor_matrix.png" style="height: 40%; width: 15%; float: left"/>
-</div>
-<div style="display: inline; border: 0px">
-    <img src="./images/tensor_3d.png" style="height: 40%; width: 15%; float: left"/>
-</div>
+<table>
+<thead><tr>
+<th>A vector</th>
+<th>A matrix</th>
+<th>A 3D Tensor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="images/tensor_vector.png" alt="tensor_vector"></td>
+<td><img src="images/tensor_matrix.png" alt="tensor_matrix"></td>
+<td><img src="images/tensor_3d.png" alt="tensor_3d"></td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
 </div>
@@ -14884,12 +14891,20 @@ div.jp-OutputPrompt {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<div style="display: inline; border: 1px">
-    <img src="./images/ttn_model.png" style="height: 100%; float: left; width: 30%"/>
-</div>
-<div style="display: inline; border: 1px">
-    <img src="./images/mps_model.png" style="height: 100%; float: right; width: 30%"/>
-</div>
+<table>
+<thead><tr>
+<th>General Tree Tensor Network</th>
+<th>Special TTN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="./images/ttn_model.png" alt="General Tree Tensor Network"></td>
+<td><img src="./images/mps_model.png" alt="Special TTN"></td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
 </div>
@@ -15048,31 +15063,31 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div><div class="fragment">
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="The-base-model">The base model<a class="anchor-link" href="#The-base-model">&#182;</a></h4><p><img src="../circuits/circuit_normal_4x4.png" style="height: 100%; width: 35%; float: left"/></p>
+<table>
+<thead><tr>
+<th>The base model</th>
+<th>The efficient model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="../circuits/circuit_normal_4x4.png" alt="Base Model"></td>
+<td><img src="../circuits/circuit_efficient_4x4.png" alt="Efficient Model"></td>
+</tr>
+</tbody>
+</table>
 
 </div>
 </div>
 </div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="The-efficient-model">The efficient model<a class="anchor-link" href="#The-efficient-model">&#182;</a></h4><p><img src="../circuits/circuit_efficient_4x4.png" style="height: 60%; float: left"/></p>
-
-</div>
-</div>
-</div>
-</div></section></section><section><section>
+</div></div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15102,12 +15117,20 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<div style="display: inline">
-    <img src="../final/efficient/circuit_efficient_accuracy_4x4.png" style="height: 100%; float: left; width: 45%"/>
-</div>
-<div style="display: inline">
-    <img src="../final/efficient/circuit_efficient_accuracy_8x8.png" style="height: 100%; float: right; width: 45%"/>
-</div>
+<h5 id="Accuracy">Accuracy<a class="anchor-link" href="#Accuracy">&#182;</a></h5><table>
+<thead><tr>
+<th>Efficient Circuit on an image 4x4</th>
+<th>Efficient Circuit on an image 8x8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="../results/efficient/circuit_efficient_accuracy_4x4.png" alt="efficient_4x4"></td>
+<td><img src="../results/efficient/circuit_efficient_accuracy_8x8.png" alt="efficient_8x8"></td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
 </div>
@@ -15130,12 +15153,20 @@ L(\Lambda) &amp;= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<div style="display: inline">
-    <img src="../final/efficient/circuit_efficient_loss_4x4.png" style="height: 100%; float: left; width: 45%"/>
-</div>
-<div style="display: inline">
-    <img src="../final/efficient/circuit_efficient_loss_8x8.png" style="height: 100%; float: right; width: 45%"/>
-</div>
+<h5 id="Loss">Loss<a class="anchor-link" href="#Loss">&#182;</a></h5><table>
+<thead><tr>
+<th>Efficient Circuit on an image 4x4</th>
+<th>Efficient Circuit on an image 8x8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="../results/efficient/circuit_efficient_loss_4x4.png" alt="efficient_4x4"></td>
+<td><img src="../results/efficient/circuit_efficient_loss_8x8.png" alt="efficient_8x8"></td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
 </div>

@@ -164,7 +164,7 @@
     \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
     % Document parameters
     % Document title
-    \title{presentation}
+    \title{Tensor Networks on Qiskit}
     
     
     
@@ -382,49 +382,8 @@
     
 
 \begin{document}
-    
+    \date{November 4, 2022}
     \maketitle
-    
-    
-
-    
-    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{9}{\boxspacing}
-\begin{Verbatim}[commandchars=\\\{\}]
-\PY{o}{\PYZpc{}\PYZpc{}javascript}
-\PY{n+nx}{MathJax}\PY{p}{.}\PY{n+nx}{Hub}\PY{p}{.}\PY{n+nx}{Config}\PY{p}{(}\PY{p}{\PYZob{}}
-    \PY{n+nx}{TeX}\PY{o}{:} \PY{p}{\PYZob{}} \PY{n+nx}{equationNumbers}\PY{o}{:} \PY{p}{\PYZob{}} \PY{n+nx}{autoNumber}\PY{o}{:} \PY{l+s+s2}{\PYZdq{}AMS\PYZdq{}} \PY{p}{\PYZcb{}} \PY{p}{\PYZcb{}}
-\PY{p}{\PYZcb{}}\PY{p}{)}\PY{p}{;}
-\end{Verbatim}
-\end{tcolorbox}
-
-    
-    \begin{Verbatim}[commandchars=\\\{\}]
-<IPython.core.display.Javascript object>
-    \end{Verbatim}
-
-    
-    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{4}{\boxspacing}
-\begin{Verbatim}[commandchars=\\\{\}]
-\PY{o}{\PYZpc{}\PYZpc{}html}
-\PY{p}{\PYZlt{}}\PY{n+nt}{style} \PY{n+na}{type}\PY{o}{=}\PY{l+s}{\PYZsq{}text/css\PYZsq{}}\PY{p}{\PYZgt{}}
-\PY{p}{.}\PY{n+nc}{CodeMirror}\PY{p}{\PYZob{}}
-\PY{+w}{    }\PY{k}{font\PYZhy{}size}\PY{p}{:}\PY{+w}{ }\PY{l+m+mi}{14}\PY{k+kt}{px}\PY{p}{;}
-\PY{p}{\PYZcb{}}
-
-\PY{n+nt}{div}\PY{p}{.}\PY{n+nc}{output\PYZus{}area}\PY{+w}{ }\PY{n+nt}{pre}\PY{+w}{ }\PY{p}{\PYZob{}}
-\PY{+w}{    }\PY{k}{font\PYZhy{}size}\PY{p}{:}\PY{+w}{ }\PY{l+m+mi}{14}\PY{k+kt}{px}\PY{p}{;}
-\PY{p}{\PYZcb{}}
-\PY{p}{\PYZlt{}}\PY{p}{/}\PY{n+nt}{style}\PY{p}{\PYZgt{}}
-\end{Verbatim}
-\end{tcolorbox}
-
-    
-    \begin{Verbatim}[commandchars=\\\{\}]
-<IPython.core.display.HTML object>
-    \end{Verbatim}
-
     
     \hypertarget{tensor-networks-with-qiskit}{%
 \section{Tensor Networks with
@@ -445,17 +404,16 @@ Networks}}}{William Huggins et al.~(2018) Towards Quantum Machine Learning with 
 In essence, they are generalization of vectors and matrices which helps
 us represent and manipulate multi-dimensional data.
 
-    \begin{verbatim}
-<img src="images/tensor_vector.png" style="height: 50%; width: 5%; float: left"/>
-\end{verbatim}
-
-\begin{verbatim}
-<img src="images/tensor_matrix.png" style="height: 40%; width: 15%; float: left"/>
-\end{verbatim}
-
-\begin{verbatim}
-<img src="images/tensor_3d.png" style="height: 40%; width: 15%; float: left"/>
-\end{verbatim}
+    \begin{longtable}[]{@{}lll@{}}
+\toprule
+A vector & A matrix & A 3D Tensor\tabularnewline
+\midrule
+\endhead
+\includegraphics{images/tensor_vector.png} &
+\includegraphics{images/tensor_matrix.png} &
+\includegraphics{images/tensor_3d.png}\tabularnewline
+\bottomrule
+\end{longtable}
 
     \hypertarget{how-do-they-differ-from-what-we-already-know}{%
 \subsection{How do they differ from what we already
@@ -529,13 +487,15 @@ binary classification with the MNIST Dataset
     The authors select a special case of Tree Tensor Networks: \emph{MPS}
 for their discriminative model.
 
-    \begin{verbatim}
-<img src="images/ttn_model.png" style="height: 100%; float: left; width: 30%"/>
-\end{verbatim}
-
-\begin{verbatim}
-<img src="images/mps_model.png" style="height: 100%; float: right; width: 30%"/>
-\end{verbatim}
+    \begin{longtable}[]{@{}ll@{}}
+\toprule
+General Tree Tensor Network & Special TTN\tabularnewline
+\midrule
+\endhead
+\includegraphics[width=0.5\textwidth]{./images/ttn_model.png} &
+\includegraphics[width=0.5\textwidth]{./images/mps_model.png}\tabularnewline
+\bottomrule
+\end{longtable}
 
     \hypertarget{learning-on-quantum-circuits}{%
 \subsubsection{Learning on Quantum
@@ -561,10 +521,10 @@ evaluated?}\label{how-is-the-model-evaluated}}
     The authors define a \textbf{loss function} based on the binary results
 from the Quantum Circuit
 
-\begin{align}
+    \begin{align}
 p_{max false}(\Lambda, x) &= \max_{l \neq l_x}[p_l(\Lambda, x)]\nonumber\\
 L(\Lambda, x) &= \max(p_{max false}(\Lambda, x) - p_{l_x}(\Lambda, x) + \lambda, 0)^\eta\nonumber\\
-L(x) &= \frac{1}{|\text{data}|} \sum_{x \in \text{data}} L(\Lambda, x)\label{eq:loss_equation}
+L(\Lambda) &= \frac{1}{|{\text{data}|}} \sum_{x \in \text{data}} L(\Lambda, x)\label{eq:loss_equation}
 \end{align}
 
     \hypertarget{how-to-minimize-the-loss-function}{%
@@ -596,13 +556,13 @@ include a momentum factor.
     Choose \(\alpha_k = \dfrac{a}{(k+1+A)^s}\) and
     \(\beta_k = \dfrac{b}{(k+1)^t}\)
   \item
-    Generate a perturbation \(\delta\).
+    Generate a perturbation \(\Delta\).
   \item
     Evaluate
-    \(g = \dfrac{L(\Lambda_k + \alpha_k\delta) - L(\Lambda_k - \alpha_k\delta)}{2\cdot\alpha_k}\)
-    with \(L(x)\) as defined in \(\eqref{eq:loss_equation}\)
+    \(g = \dfrac{L(\Lambda_k + \alpha_k\Delta) - L(\Lambda_k - \alpha_k\Delta)}{2\cdot\alpha_k}\)
+    with \(L(\Lambda)\) as defined in \(\eqref{eq:loss_equation}\)
   \item
-    \(v_{new} = \gamma\cdot v_{old} - g\cdot\beta_k\cdot\delta\)
+    \(v_{new} = \gamma\cdot v_{old} - g\cdot\beta_k\cdot\Delta\)
   \item
     \(\Lambda_{new} = \Lambda_{old} + v_{new}\)
   \end{enumerate}
@@ -611,22 +571,52 @@ include a momentum factor.
     \hypertarget{the-networks}{%
 \subsubsection{The networks\ldots{}}\label{the-networks}}
 
-    \hypertarget{the-base-model}{%
-\paragraph{The base model}\label{the-base-model}}
-
-    \hypertarget{the-efficient-model}{%
-\paragraph{The efficient model}\label{the-efficient-model}}
+    \begin{longtable}[]{@{}ll@{}}
+\toprule
+The base model & The efficient model\tabularnewline
+\midrule
+\endhead
+\includegraphics[width=0.4\textwidth]{../circuits/circuit_normal_4x4.png} &
+\includegraphics[width=0.6\textwidth]{../circuits/circuit_efficient_4x4.png}\tabularnewline
+\bottomrule
+\end{longtable}
 
     \hypertarget{the-results}{%
 \subsubsection{The results\ldots{}}\label{the-results}}
 
     The bottom line: They are not great
 
+    \hypertarget{accuracy}{%
+\subparagraph{Accuracy}\label{accuracy}}
+
+\begin{longtable}[H]{@{}ll@{}}
+\toprule
+Efficient Circuit on an image 4x4 & Efficient Circuit on an image
+8x8\tabularnewline
+\midrule
+\endhead
+\includegraphics[width=0.5\textwidth]{../results/efficient/circuit_efficient_accuracy_4x4.png}
+&
+\includegraphics[width=0.5\textwidth]{../results/efficient/circuit_efficient_accuracy_8x8.png}\tabularnewline
+\bottomrule
+\end{longtable}
+
     They claimed above 95\% accuracy yet during training, accuracy was not
 above 55\%
 
-    Despite the batch size defined by the authors, the models performed
-better using a smaller batch size.
+    \hypertarget{loss}{%
+\subparagraph{Loss}\label{loss}}
+
+\begin{longtable}[H]{@{}ll@{}}
+\toprule
+Efficient Circuit on an image 4x4 & Efficient Circuit on an image
+8x8\tabularnewline
+\midrule
+\endhead
+\includegraphics[width=0.5\textwidth]{../results/efficient/circuit_efficient_loss_4x4.png} &
+\includegraphics[width=0.5\textwidth]{../results/efficient/circuit_efficient_loss_8x8.png}\tabularnewline
+\bottomrule
+\end{longtable}
 
     \hypertarget{shortcomings}{%
 \subsubsection{Shortcomings}\label{shortcomings}}
