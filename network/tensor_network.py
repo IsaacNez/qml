@@ -1,4 +1,8 @@
-""" Class definition for the Tensor Network """
+""" Class definition for the Tensor Network 
+
+Work is motivated by contributions from 
+Philipp Seitz (https://github.com/Gistbatch/quantum)
+"""
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
