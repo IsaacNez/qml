@@ -1,4 +1,9 @@
-""" Class definition for the Quantum Operator """
+""" Class definition for the Quantum Operator 
+
+AGPLv3 (c) 2022
+Author: Isaac Nunez (isaac.nunez@tum.de)
+
+"""
 import os
 import numpy as np
 from typing import *
